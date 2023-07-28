@@ -1,3 +1,5 @@
+
+
 DB_COLUMNS = {
   Product: {
     Artikul: "Артикул",
@@ -39,3 +41,5 @@ DB_COLUMNS = {
   }
 
 }
+
+

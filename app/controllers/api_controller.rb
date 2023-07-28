@@ -34,9 +34,37 @@ class ApiController < ApplicationController
   end
 
   def import_data_from_api
-    import_data_from_api_select('products', 'http://192.168.3.14/erp_main/hs/price/noma/', :Product)
-    import_data_from_api_select('leftovers', 'http://192.168.3.14/erp_main/hs/price/ostatki/', :Leftover)
-    import_data_from_api_select('prices', 'http://192.168.3.14/erp_main/hs/price/prices/', :Price)
+    # import_data_from_api_select('products', 'http://192.168.3.14/erp_main/hs/price/noma/', :Product)
+    # import_data_from_api_select('leftovers', 'http://192.168.3.14/erp_main/hs/price/ostatki/', :Leftover)
+    # import_data_from_api_select('prices', 'http://192.168.3.14/erp_main/hs/price/prices/', :Price)
+
+    price
+  end
+
+  def price
+    products_with_leftovers = Product.joins("LEFT JOIN prices ON products.Artikul = prices.Artikul")
+                                     .joins("LEFT JOIN leftovers ON products.Artikul = leftovers.Artikul")
+                                     .select('products.*,
+                                          SUM(CASE WHEN prices.Vidceny = "Мин" THEN prices.Cena ELSE 0 END) as Price_Cena,
+                                          SUM(CASE WHEN prices.Vidceny = "Маг" THEN prices.Cena ELSE 0 END) as Price_Cena_Mag,
+                                          SUM(CASE WHEN leftovers.GruppaSkladov = "ОСПП и ТСС" THEN leftovers.Kolichestvo ELSE 0 END) as Sklad1_quantity,
+                                          SUM(CASE WHEN leftovers.GruppaSkladov = "РОЗНИЦА" THEN leftovers.Kolichestvo ELSE 0 END) as Sklad3_quantity')
+                                     .group('products.id')
+
+
+
+
+    products_with_leftovers.each do |product|
+      puts "Продукт: #{product.Nomenklatura}"
+      puts "Artikul: #{product.Artikul}"
+      puts "Sklad1_quantity: #{product.Sklad1_quantity}"
+      puts "Sklad3_quantity: #{product.Sklad3_quantity}"
+      puts "Price_Cena: #{product.Price_Cena}"
+      puts "Price_Cena_Mag: #{product.Price_Cena_Mag}"
+
+    end
+
   end
 
 end
+
