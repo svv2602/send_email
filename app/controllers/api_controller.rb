@@ -22,7 +22,7 @@ class ApiController < ApplicationController
           end
 
           unless product.save
-            # Обработка ошибок сохранения, если необходимо
+            # Обработка ошибок сохранения
             puts "Ошибка сохранения продукта: #{product.errors.full_messages.join(', ')}"
             raise ActiveRecord::Rollback # Откатим транзакцию в случае ошибки
           end
@@ -33,7 +33,7 @@ class ApiController < ApplicationController
     else
       puts "Не удалось получить данные #{table_key.to_s} с API."
     end
-    # redirect_to root_path
+
   end
 
   def import_data_from_api
@@ -77,16 +77,14 @@ class ApiController < ApplicationController
     end
 
 
-
     xls_file.write file_path
 
     send_file file_path, filename: 'leftovers_with_properties.xls', type: 'application/vnd.ms-excel', disposition: 'attachment'
   end
 
   def grouped_vidceny
-    group = Price.group(:Vidceny).order(:Vidceny).pluck(:Vidceny)
+    Price.group(:Vidceny).order(:Vidceny).pluck(:Vidceny)
   end
-
 
 
 end
