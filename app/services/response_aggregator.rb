@@ -124,24 +124,11 @@ module ResponseAggregator
       attr_query << "#{el}"
     end
 
-
     attr_query
   end
 
 
 end
 
-class TestMe
-  include ResponseAggregator
-end
 
-grouped_vidceny = ["Интернет", "Маг", "Маг1", "Маг2", "Маг3", "Маг4", "Мин", "Опт",
-                   "Розница", "Спец", "Спец А", "Спец Б", "Спец С", "Тендер"]
-d = TestMe.new
-# puts d.query1_where_sklad
-# puts d.query1_select_sklad
-puts d.query2_select_sklad
-# puts d.query2_where_price(grouped_vidceny)
-# puts d.query2_select_price(grouped_vidceny)
-# puts d.query1_select_price(grouped_vidceny)
 

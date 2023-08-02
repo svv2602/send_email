@@ -58,7 +58,6 @@ class ApiController < ApplicationController
 
   def export_to_xls
 
-
     grouped_results = grouped_results_all
     # Создание объекта для XLS-файла
     xls_file = Spreadsheet::Workbook.new
@@ -86,34 +85,6 @@ class ApiController < ApplicationController
 
   def grouped_vidceny
     group = Price.group(:Vidceny).order(:Vidceny).pluck(:Vidceny)
-  end
-
-  def build_leftovers_combined_query_new
-    strSql = 'products.*'
-    query1_select_sklad
-
-    leftover_query = Leftover.joins(:product)
-                             .select("Leftovers.Artikul as artikul,
-                                    #{query1_select_sklad},
-                                    #{query1_select_price(grouped_vidceny)},
-                                    #{strSql}")
-                             .where("#{query1_where_sklad}")
-                             .group("Leftovers.Artikul, products.TovarnayaKategoriya")
-
-    price_query = Price.joins(:product)
-                       .select("Prices.Artikul as artikul,
-                              #{query2_select_sklad},
-                              #{query2_select_price(grouped_vidceny)},
-                              #{strSql}")
-                       .where("#{query2_where_price(grouped_vidceny)}")
-                       .group("Prices.Artikul, products.TovarnayaKategoriya")
-
-
-    @combined_results = Leftover.from("(#{leftover_query.to_sql} UNION #{price_query.to_sql}) AS leftovers_combined")
-                                .order("leftovers_combined.TovarnayaKategoriya, leftovers_combined.artikul")
-
-
-
   end
 
 
