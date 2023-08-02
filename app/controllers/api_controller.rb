@@ -1,7 +1,10 @@
 require 'httparty'
 require_relative '../../lib/assets/db_const'
+require 'spreadsheet'
+require_relative '../services/response_aggregator'
 
 class ApiController < ApplicationController
+  include ResponseAggregator
 
   def import_data_from_api_select(table_name, url, table_key)
     response = HTTParty.get(url)
@@ -34,37 +37,123 @@ class ApiController < ApplicationController
   end
 
   def import_data_from_api
-    # import_data_from_api_select('products', 'http://192.168.3.14/erp_main/hs/price/noma/', :Product)
-    # import_data_from_api_select('leftovers', 'http://192.168.3.14/erp_main/hs/price/ostatki/', :Leftover)
-    # import_data_from_api_select('prices', 'http://192.168.3.14/erp_main/hs/price/prices/', :Price)
+    # import_data_load
+    export_to_xls
 
-    price
   end
 
-  def price
-    products_with_leftovers = Product.joins("LEFT JOIN prices ON products.Artikul = prices.Artikul")
-                                     .joins("LEFT JOIN leftovers ON products.Artikul = leftovers.Artikul")
-                                     .select('products.*,
-                                          SUM(CASE WHEN prices.Vidceny = "Мин" THEN prices.Cena ELSE 0 END) as Price_Cena,
-                                          SUM(CASE WHEN prices.Vidceny = "Маг" THEN prices.Cena ELSE 0 END) as Price_Cena_Mag,
-                                          SUM(CASE WHEN leftovers.GruppaSkladov = "ОСПП и ТСС" THEN leftovers.Kolichestvo ELSE 0 END) as Sklad1_quantity,
-                                          SUM(CASE WHEN leftovers.GruppaSkladov = "РОЗНИЦА" THEN leftovers.Kolichestvo ELSE 0 END) as Sklad3_quantity')
-                                     .group('products.id')
+  def import_data_load
+    import_data_from_api_select('products', 'http://192.168.3.14/erp_main/hs/price/noma/', :Product)
+    import_data_from_api_select('leftovers', 'http://192.168.3.14/erp_main/hs/price/ostatki/', :Leftover)
+    import_data_from_api_select('prices', 'http://192.168.3.14/erp_main/hs/price/prices/', :Price)
+    import_data_from_api_select('partners', 'http://192.168.3.14/erp_main/hs/price/kontragent/', :Partner)
+    bracket_replacement
+  end
+
+  def bracket_replacement
+    ActiveRecord::Base.connection.execute("UPDATE leftovers SET Sklad = REPLACE(Sklad, '(', '') WHERE Sklad LIKE '%(%'")
+    ActiveRecord::Base.connection.execute("UPDATE leftovers SET Sklad = REPLACE(Sklad, ')', '') WHERE Sklad LIKE '%)%'")
+  end
+
+
+  def export_to_xls
+
+
+    grouped_results = build_leftovers_combined_query_new.group(:artikul).select(
+      "artikul",
+      "Nomenklatura",
+      "Razmer",
+      "Indeksnagruzki",
+      "TovarnayaKategoriya",
+      "Proizvoditel",
+      "VidNomenklatury",
+      "TipTovara",
+      "SezonnayaGruppa",
+      "SUM(Cena_0) as  Cena_0",
+      "SUM( Cena_1) as  Cena_1",
+      "SUM( Cena_2) as  Cena_2",
+      "SUM( Cena_3) as  Cena_3",
+      "SUM( Cena_4) as  Cena_4",
+      "SUM( Sklad_0) as  Sklad_0",
+      "SUM( Sklad_1) as  Sklad_1",
+      "SUM( Sklad_2) as Sklad_2"
+
+    )
+
+
+    # Создание объекта для XLS-файла
+    xls_file = Spreadsheet::Workbook.new
+    xls_sheet = xls_file.create_worksheet(name: 'Leftovers')
+
+    # Добавление заголовков в таблицу XLS
+    xls_sheet.row(0).concat ['Artikul','Nomenklatura', 'Razmer' ,'Indeksnagruzki' , 'TovarnayaKategoriya','Днепр', 'ОСПП', 'РОЗНИЦА', 'Mag','Spec','Opt']
+
+    # Генерация файла и отправка клиенту
+    file_path = "#{Rails.root}/tmp/leftovers_with_properties.xls"
 
 
 
-
-    products_with_leftovers.each do |product|
-      puts "Продукт: #{product.Nomenklatura}"
-      puts "Artikul: #{product.Artikul}"
-      puts "Sklad1_quantity: #{product.Sklad1_quantity}"
-      puts "Sklad3_quantity: #{product.Sklad3_quantity}"
-      puts "Price_Cena: #{product.Price_Cena}"
-      puts "Price_Cena_Mag: #{product.Price_Cena_Mag}"
-
+   # Заполнение таблицы данными
+    grouped_results.each_with_index do |leftover, index|
+      xls_sheet.row(index + 1).push(
+        leftover.artikul,
+        leftover.Nomenklatura,
+        leftover.Proizvoditel,
+        leftover.VidNomenklatury,
+        leftover.TipTovara,
+        leftover.SezonnayaGruppa,
+        leftover.Razmer,
+        leftover.Indeksnagruzki,
+        leftover.TovarnayaKategoriya,
+        leftover['Cena_0'],
+        leftover['Cena_1'],
+        leftover['Cena_2'],
+        leftover['Cena_3'],
+        leftover['Cena_4'],
+        leftover['Sklad_0'],
+        leftover['Sklad_1'],
+        leftover['Sklad_2']
+      )
     end
 
+    xls_file.write file_path
+
+    send_file file_path, filename: 'leftovers_with_properties.xls', type: 'application/vnd.ms-excel', disposition: 'attachment'
   end
+
+  def grouped_vidceny
+    group = Price.group(:Vidceny).order(:Vidceny).pluck(:Vidceny)
+  end
+
+  def build_leftovers_combined_query_new
+    strSql = 'products.*'
+    query1_select_sklad
+
+    leftover_query = Leftover.joins(:product)
+                             .select("Leftovers.Artikul as artikul,
+                                    #{query1_select_sklad},
+                                    #{query1_select_price(grouped_vidceny)},
+                                    #{strSql}")
+                             .where("#{query1_where_sklad}")
+                             .group("Leftovers.Artikul, products.TovarnayaKategoriya")
+
+    price_query = Price.joins(:product)
+                       .select("Prices.Artikul as artikul,
+                              #{query2_select_sklad},
+                              #{query2_select_price(grouped_vidceny)},
+                              #{strSql}")
+                       .where("#{query2_where_price(grouped_vidceny)}")
+                       .group("Prices.Artikul, products.TovarnayaKategoriya")
+
+
+    @combined_results = Leftover.from("(#{leftover_query.to_sql} UNION #{price_query.to_sql}) AS leftovers_combined")
+                                .order("leftovers_combined.TovarnayaKategoriya, leftovers_combined.artikul")
+
+
+
+  end
+
+
 
 end
 

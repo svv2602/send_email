@@ -1,5 +1,3 @@
-
-
 DB_COLUMNS = {
   Product: {
     Artikul: "Артикул",
@@ -26,6 +24,7 @@ DB_COLUMNS = {
     God: "Год",
     KodUKTVED: "КодУКТВЭД"
   },
+
   Leftover: {
     Artikul: "Артикул",
     Sklad: "Склад",
@@ -34,12 +33,24 @@ DB_COLUMNS = {
     GruppaSkladov: "ГруппаСкладов",
     Gorod: "Город"
   },
+
   Price: {
     Artikul: "Артикул",
     Vidceny: "ВидЦены",
     Cena: "Цена"
-  }
+  },
 
+  Partner: {
+    Kontragent: "Контрагент",
+    Email: "Email",
+    Partner: "Партнер",
+    OsnovnoiMeneger: "ОсновнойМенеджер",
+    TelefonPodrazdeleniia: "ТелефонПодразделения",
+    Gorod: "Город",
+    Podrazdelenie: "Подразделение"
+  }
 }
+
+
 
 

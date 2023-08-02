@@ -10,50 +10,62 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2023_07_28_100122) do
+ActiveRecord::Schema[7.0].define(version: 2023_07_31_075615) do
   create_table "leftovers", force: :cascade do |t|
-    t.text "Artikul"
-    t.text "Sklad"
-    t.text "SkladKod"
-    t.text "Kolichestvo"
-    t.text "GruppaSkladov"
-    t.text "Gorod"
+    t.text "Artikul", default: ""
+    t.text "Sklad", default: ""
+    t.text "SkladKod", default: ""
+    t.text "Kolichestvo", default: ""
+    t.text "GruppaSkladov", default: ""
+    t.text "Gorod", default: ""
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
+  create_table "partners", force: :cascade do |t|
+    t.text "Kontragent", default: ""
+    t.text "Email", default: ""
+    t.text "Partner", default: ""
+    t.text "OsnovnoiMeneger", default: ""
+    t.text "TelefonPodrazdeleniia", default: ""
+    t.text "Gorod", default: ""
+    t.text "Podrazdelenie", default: ""
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
   end
 
   create_table "prices", force: :cascade do |t|
-    t.text "Artikul"
-    t.text "Vidceny"
-    t.text "Cena"
+    t.text "Artikul", default: ""
+    t.text "Vidceny", default: ""
+    t.text "Cena", default: ""
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
   end
 
   create_table "products", force: :cascade do |t|
-    t.text "Artikul"
-    t.text "Nomenklatura"
-    t.text "Ves"
-    t.text "Proizvoditel"
-    t.text "VidNomenklatury"
-    t.text "TipTovara"
-    t.text "TovarnayaKategoriya"
-    t.text "Obem"
-    t.text "SezonnayaGruppa"
-    t.text "Napravleniegruppy"
-    t.text "Posadochnyydiametr"
-    t.text "Razmer"
-    t.text "Vysotaprofilya"
-    t.text "Indeksnagruzki"
-    t.text "Shirinaprofilya"
-    t.text "Indeksskorosti"
-    t.text "Tiprisunkaprotektora"
-    t.text "Stranaproiskhozhdeniya"
-    t.text "Segment"
-    t.text "Model"
-    t.text "Primenimost"
-    t.text "God"
-    t.text "KodUKTVED"
+    t.text "Artikul", default: ""
+    t.text "Nomenklatura", default: ""
+    t.text "Ves", default: ""
+    t.text "Proizvoditel", default: ""
+    t.text "VidNomenklatury", default: ""
+    t.text "TipTovara", default: ""
+    t.text "TovarnayaKategoriya", default: ""
+    t.text "Obem", default: ""
+    t.text "SezonnayaGruppa", default: ""
+    t.text "Napravleniegruppy", default: ""
+    t.text "Posadochnyydiametr", default: ""
+    t.text "Razmer", default: ""
+    t.text "Vysotaprofilya", default: ""
+    t.text "Indeksnagruzki", default: ""
+    t.text "Shirinaprofilya", default: ""
+    t.text "Indeksskorosti", default: ""
+    t.text "Tiprisunkaprotektora", default: ""
+    t.text "Stranaproiskhozhdeniya", default: ""
+    t.text "Segment", default: ""
+    t.text "Model", default: ""
+    t.text "Primenimost", default: ""
+    t.text "God", default: ""
+    t.text "KodUKTVED", default: ""
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
   end
