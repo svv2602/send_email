@@ -64,7 +64,7 @@ module ResponseAggregator
     str
   end
 
-  def build_leftovers_combined_query_new
+  def build_leftovers_combined_query
     strSql = 'products.*'
     query1_select_sklad
 
@@ -89,11 +89,44 @@ module ResponseAggregator
                                 .order("leftovers_combined.TovarnayaKategoriya, leftovers_combined.artikul")
 
 
-
-
   end
 
-  #====================================================================
+  def grouped_results_all
+    attr_query = ["artikul"]
+
+    grouped_vidceny.each_with_index do |el, i|
+      attr_query << "SUM(Cena_#{i}) as  `#{el}`"
+    end
+
+    arr_sklad.each_with_index do |el, i|
+      attr_query << "SUM(Sklad_#{i}) as `#{el}`"
+    end
+
+    Product.first.attribute_names.each do |el|
+      attr_query << "#{el}  as `#{el}`"
+    end
+
+    grouped_results = build_leftovers_combined_query.group(:artikul).select( attr_query )
+  end
+
+  def grouped_name_collumns_results_all
+    attr_query = []
+
+    Product.first.attribute_names.each do |el|
+      attr_query << "#{el}"
+    end
+
+    arr_sklad.each_with_index do |el, i|
+      attr_query << "#{el}"
+    end
+
+    grouped_vidceny.each_with_index do |el, i|
+      attr_query << "#{el}"
+    end
+
+
+    attr_query
+  end
 
 
 end

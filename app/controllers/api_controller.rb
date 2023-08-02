@@ -59,62 +59,25 @@ class ApiController < ApplicationController
   def export_to_xls
 
 
-    grouped_results = build_leftovers_combined_query_new.group(:artikul).select(
-      "artikul",
-      "Nomenklatura",
-      "Razmer",
-      "Indeksnagruzki",
-      "TovarnayaKategoriya",
-      "Proizvoditel",
-      "VidNomenklatury",
-      "TipTovara",
-      "SezonnayaGruppa",
-      "SUM(Cena_0) as  Cena_0",
-      "SUM( Cena_1) as  Cena_1",
-      "SUM( Cena_2) as  Cena_2",
-      "SUM( Cena_3) as  Cena_3",
-      "SUM( Cena_4) as  Cena_4",
-      "SUM( Sklad_0) as  Sklad_0",
-      "SUM( Sklad_1) as  Sklad_1",
-      "SUM( Sklad_2) as Sklad_2"
-
-    )
-
-
+    grouped_results = grouped_results_all
     # Создание объекта для XLS-файла
     xls_file = Spreadsheet::Workbook.new
     xls_sheet = xls_file.create_worksheet(name: 'Leftovers')
 
+    column_names = grouped_name_collumns_results_all
     # Добавление заголовков в таблицу XLS
-    xls_sheet.row(0).concat ['Artikul','Nomenklatura', 'Razmer' ,'Indeksnagruzki' , 'TovarnayaKategoriya','Днепр', 'ОСПП', 'РОЗНИЦА', 'Mag','Spec','Opt']
+    xls_sheet.row(0).concat column_names
 
     # Генерация файла и отправка клиенту
     file_path = "#{Rails.root}/tmp/leftovers_with_properties.xls"
 
-
-
-   # Заполнение таблицы данными
+    # Заполнение таблицы данными
     grouped_results.each_with_index do |leftover, index|
-      xls_sheet.row(index + 1).push(
-        leftover.artikul,
-        leftover.Nomenklatura,
-        leftover.Proizvoditel,
-        leftover.VidNomenklatury,
-        leftover.TipTovara,
-        leftover.SezonnayaGruppa,
-        leftover.Razmer,
-        leftover.Indeksnagruzki,
-        leftover.TovarnayaKategoriya,
-        leftover['Cena_0'],
-        leftover['Cena_1'],
-        leftover['Cena_2'],
-        leftover['Cena_3'],
-        leftover['Cena_4'],
-        leftover['Sklad_0'],
-        leftover['Sklad_1'],
-        leftover['Sklad_2']
-      )
+      row_values = column_names.map { |column| leftover.send(column) }
+      xls_sheet.row(index + 1).push(*row_values)
     end
+
+
 
     xls_file.write file_path
 
