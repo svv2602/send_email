@@ -57,14 +57,25 @@ class ApiController < ApplicationController
 
 
   def export_to_xls
+    # временные переменные, заменить на получаемые по API
+    skl = ['Винница ОСПП оптовый склад','Главный склад Днепр  оптовый склад']
+    grup = ['ОСПП и ТСС', 'РОЗНИЦА']
 
-    grouped_results = grouped_results_all
+    # Получить хеш с для построения запроса
+    hash_with_params_sklad = hash_query_params_sklad(skl, grup)
+
+    #
+    results = build_leftovers_combined_query(hash_with_params_sklad)
+    grouped_results = results.group(:artikul)
+                             .select( hash_grouped_name_collumns(hash_with_params_sklad[:array_name_sklad])[:attr_query])
+
+
     # Создание объекта для XLS-файла
     xls_file = Spreadsheet::Workbook.new
     xls_sheet = xls_file.create_worksheet(name: 'Leftovers')
 
-    column_names = grouped_name_collumns_results_all
     # Добавление заголовков в таблицу XLS
+    column_names = hash_grouped_name_collumns(hash_with_params_sklad[:array_name_sklad])[:attr_query_name_collumn]
     xls_sheet.row(0).concat column_names
 
     # Генерация файла и отправка клиенту
@@ -75,6 +86,23 @@ class ApiController < ApplicationController
       row_values = column_names.map { |column| leftover.send(column) }
       xls_sheet.row(index + 1).push(*row_values)
     end
+
+    # Создание Второго листа для XLS-файла
+    xls_sheet = xls_file.create_worksheet(name: 'Leftovers_2')
+
+    # Добавление заголовков в таблицу XLS
+    column_names = hash_grouped_name_collumns(hash_with_params_sklad[:array_name_sklad])[:attr_query_name_collumn]
+    xls_sheet.row(0).concat column_names
+
+    # Генерация файла и отправка клиенту
+    file_path = "#{Rails.root}/tmp/leftovers_with_properties.xls"
+
+    # Заполнение таблицы данными
+    grouped_results.each_with_index do |leftover, index|
+      row_values = column_names.map { |column| leftover.send(column) }
+      xls_sheet.row(index + 1).push(*row_values)
+    end
+
 
 
     xls_file.write file_path
