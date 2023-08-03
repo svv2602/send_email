@@ -38,7 +38,8 @@ class ApiController < ApplicationController
 
   def import_data_from_api
     # import_data_load
-    export_to_xls
+    # export_to_xls
+    generate_and_send_email
 
   end
 
@@ -77,18 +78,20 @@ class ApiController < ApplicationController
 
     xls_sheet.row(0).concat column_names
 
-    # Генерация файла и отправка клиенту
-    file_path = "#{Rails.root}/tmp/leftovers_with_properties.xls"
-
     # Заполнение таблицы данными
     grouped_results.each_with_index do |leftover, index|
       row_values = column_names.map { |column| leftover.send(column) }
       xls_sheet.row(index + 1).push(*row_values)
     end
 
-    xls_file.write file_path
 
-    send_file file_path, filename: 'leftovers_with_properties.xls', type: 'application/vnd.ms-excel', disposition: 'attachment'
+    xls_data = StringIO.new
+    xls_file.write xls_data
+
+    # Сохраняем файл на сервере
+    @file_path = "#{Rails.root}/tmp/leftovers_with_properties.xls"
+    File.open(@file_path, 'wb') { |f| f.write(xls_data.string) }
+
   end
 
   def grouped_vidceny
@@ -103,6 +106,25 @@ class ApiController < ApplicationController
     @price = ["Интернет", "Мин", "Опт", "Спец С", "Интернет", "Мин", "Опт", "Спец С"].uniq
     @product = ["id","Artikul","Nomenklatura", "Ves", "Artikul","Nomenklatura", "Ves", "Proizvoditel", "VidNomenklatury", "TipTovara", "TovarnayaKategoriya"].uniq
     @max_count = 20
+  end
+
+  def generate_and_send_email
+    export_to_xls
+    file_path = @file_path
+
+    # Здесь указываете email получателя
+    recipient_email = 'svv@invelta.com.ua'
+
+
+    # Отправляем письмо с вложением
+    MyMailer.send_email_with_attachment(recipient_email, file_path).deliver_now
+
+
+    # Удалить временный файл
+    File.delete(@file_path) if File.exist?(@file_path)
+
+    # Отображаем результат пользователю
+    render plain: 'Email sent successfully!'
   end
 
 end
