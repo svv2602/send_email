@@ -79,4 +79,8 @@ Rails.application.configure do
     enable_starttls_auto: false
   }
 
+  config.action_mailer.logger = ActiveSupport::Logger.new(STDOUT)
+  config.action_mailer.logger.level = :info # Измените на :info или другой уровень логирования при необходимости
+
+
 end

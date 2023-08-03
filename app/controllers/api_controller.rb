@@ -5,6 +5,7 @@ require_relative '../services/response_aggregator'
 
 class ApiController < ApplicationController
   include ResponseAggregator
+  after_action :delete_old_emails, only: :import_data_from_api
 
   def import_data_from_api_select(table_name, url, table_key)
 
@@ -143,6 +144,27 @@ class ApiController < ApplicationController
 
     # Отображаем результат пользователю
     render plain: 'Email sent successfully!'
+  end
+
+  def report_email
+    # Получить все успешно доставленные письма за последние 7 дней
+    deliveries = Email.where('created_at > ?', Time.now - 7.days)
+
+    @msg_data_load = ""
+    # Вывести email-адреса получателей
+    deliveries.each do |delivery|
+      @msg_data_load_select = " #{delivery.to } #{" "*20} время: #{delivery.created_at } \n"
+      @msg_data_load += @msg_data_load_select
+      puts @msg_data_load_select
+    end
+
+    render plain: @msg_data_load
+  end
+
+  def delete_old_emails
+    days_ago = 30.days.ago
+    Email.where('created_at < ?', days_ago).destroy_all
+    puts "Удалены все записи из Email, старше #{days_ago} дней."
   end
 
 end

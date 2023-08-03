@@ -10,7 +10,16 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2023_07_31_075615) do
+ActiveRecord::Schema[7.0].define(version: 2023_08_03_130750) do
+  create_table "emails", force: :cascade do |t|
+    t.string "to"
+    t.string "subject"
+    t.text "body"
+    t.boolean "delivered", default: false
+    t.datetime "created_at", null: false
+    t.datetime "updated_at", null: false
+  end
+
   create_table "leftovers", force: :cascade do |t|
     t.text "Artikul", default: ""
     t.text "Sklad", default: ""
