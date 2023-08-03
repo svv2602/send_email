@@ -78,5 +78,6 @@ gem "httparty", "~> 0.21.0"
 
 gem "activerecord", "~> 7.0"
 
-
 gem "spreadsheet", "~> 1.3"
+
+

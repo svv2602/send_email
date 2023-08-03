@@ -7,6 +7,7 @@ class ApiController < ApplicationController
   include ResponseAggregator
 
   def import_data_from_api_select(table_name, url, table_key)
+
     response = HTTParty.get(url)
     if response.code == 200
       product_class = table_name.capitalize.singularize.constantize
@@ -28,27 +29,45 @@ class ApiController < ApplicationController
           end
         end
       end
-
-      puts "Данные #{table_key.to_s} успешно импортированы в базу данных!"
+      @msg_data_load_select = "Данные #{table_key.to_s} успешно импортированы в базу данных! \n"
     else
-      puts "Не удалось получить данные #{table_key.to_s} с API."
+      @msg_data_load_select = "Не удалось получить данные #{table_key.to_s} с API."
     end
 
+    puts @msg_data_load_select
+    @msg_data_load += @msg_data_load_select
   end
 
   def import_data_from_api
-    # import_data_load
+    @msg_data_load = ""
+    import_data_load
+    render plain: @msg_data_load
+
     # export_to_xls
-    generate_and_send_email
+    # generate_and_send_email
 
   end
 
   def import_data_load
-    import_data_from_api_select('products', 'http://192.168.3.14/erp_main/hs/price/noma/', :Product)
-    import_data_from_api_select('leftovers', 'http://192.168.3.14/erp_main/hs/price/ostatki/', :Leftover)
-    import_data_from_api_select('prices', 'http://192.168.3.14/erp_main/hs/price/prices/', :Price)
-    import_data_from_api_select('partners', 'http://192.168.3.14/erp_main/hs/price/kontragent/', :Partner)
-    bracket_replacement
+    params_table = [{table_name:'products', url:'http://192.168.3.14/erp_main/hs/price/noma/', table_key: :Product},
+                    {table_name:'leftovers', url:'http://192.168.3.14/erp_main/hs/price/ostatki/', table_key: :Leftover},
+                    {table_name:'prices', url:'http://192.168.3.14/erp_main/hs/price/prices/', table_key: :Price},
+                    {table_name:'partners', url:'http://192.168.3.14/erp_main/hs/price/kontragent/', table_key: :Partner},
+    ]
+
+    params_table.each  do | el |
+      max_update_date = el[:table_key].to_s.capitalize.singularize.constantize.maximum(:updated_at)
+
+      if max_update_date && max_update_date.to_date == Date.current
+        @msg_data_load_select = "Данные #{el[:table_key].to_s} были загружены  #{max_update_date} и не требуют обновления \n"
+        puts @msg_data_load_select
+        @msg_data_load += @msg_data_load_select
+      else
+        import_data_from_api_select(el[:table_name], el[:url], el[:table_key])
+        bracket_replacement if el[:table_name] == 'leftovers' # Убрать скобки в названиях складов
+      end
+    end
+
   end
 
   def bracket_replacement
@@ -91,7 +110,7 @@ class ApiController < ApplicationController
     # Сохраняем файл на сервере
     @file_path = "#{Rails.root}/tmp/leftovers_with_properties.xls"
     File.open(@file_path, 'wb') { |f| f.write(xls_data.string) }
-
+    render plain: "Создан новый прайс  #{@file_path}"
   end
 
   def grouped_vidceny
