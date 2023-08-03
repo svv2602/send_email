@@ -56,18 +56,13 @@ class ApiController < ApplicationController
   end
 
 
-  def export_to_xls
-    # временные переменные, заменить на получаемые по API
-    @sheet_name = "Легковая шина"
-    skl = ['Винница ОСПП оптовый склад','Главный склад Днепр  оптовый склад']
-    grup = ['ОСПП и ТСС', 'РОЗНИЦА']
-    price = ["Интернет", "Мин", "Опт", "Спец А", "Спец Б", "Спец С"]
-    product = ["Nomenklatura", "Ves", "Proizvoditel", "VidNomenklatury", "TipTovara", "TovarnayaKategoriya"]
-    max_count = 20
 
+  def export_to_xls
+
+    set_sheet_params
 
     # Получить хеш с для построения запроса
-    hash_with_params_sklad = hash_query_params_all(skl, grup, price, product, max_count)
+    hash_with_params_sklad = hash_query_params_all(@skl, @grup, @price, @product, @max_count)
 
     results = build_leftovers_combined_query(hash_with_params_sklad)
     grouped_results = results.group(:artikul)
@@ -98,6 +93,16 @@ class ApiController < ApplicationController
 
   def grouped_vidceny
     Price.group(:Vidceny).order(:Vidceny).pluck(:Vidceny)
+  end
+
+  def set_sheet_params
+    # временные переменные, заменить на получаемые по API
+    @sheet_name = "Легковая шина"
+    @skl = ['Винница ОСПП оптовый склад','Главный склад Днепр  оптовый склад'].uniq
+    @grup = ['ОСПП и ТСС', 'РОЗНИЦА'].uniq
+    @price = ["Интернет", "Мин", "Опт", "Спец С", "Интернет", "Мин", "Опт", "Спец С"].uniq
+    @product = ["id","Artikul","Nomenklatura", "Ves", "Artikul","Nomenklatura", "Ves", "Proizvoditel", "VidNomenklatury", "TipTovara", "TovarnayaKategoriya"].uniq
+    @max_count = 20
   end
 
 end

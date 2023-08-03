@@ -17,7 +17,6 @@ module ResponseAggregator
         value.each do |element|
           array_name_sum << element
           array_query1_where << "#{strSQL} = '#{element}'"
-          # array_query1_select << "SUM(CASE WHEN #{strSQL} = '#{element}' THEN CAST(Leftovers.Kolichestvo AS INTEGER) ELSE 0 END) as Field_#{array_name_sum.index(element)}"
 
           array_query1_select << "CASE
           WHEN SUM(CASE WHEN #{strSQL} = '#{element}' THEN CAST(Leftovers.Kolichestvo AS INTEGER) ELSE 0 END) < #{max_count} THEN
@@ -25,7 +24,6 @@ module ResponseAggregator
           ELSE
           #{max_count}
           END AS Field_#{array_name_sum.index(element)}"
-
 
           array_query2_select << "0 as Field_#{array_name_sum.index(element)}"
         end
@@ -45,9 +43,9 @@ module ResponseAggregator
     # Обработка таблицы товаров
     if product.is_a?(Array) && !product.empty?
       product.each do |element|
-        array_query1_select << element
-        array_query2_select << element
-        array_name << element
+        array_query1_select << "products.#{element}"
+        array_query2_select << "products.#{element}"
+        array_name << "#{element}"
       end
     end
 
