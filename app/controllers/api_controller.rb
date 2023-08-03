@@ -110,7 +110,8 @@ class ApiController < ApplicationController
     # Сохраняем файл на сервере
     @file_path = "#{Rails.root}/tmp/leftovers_with_properties.xls"
     File.open(@file_path, 'wb') { |f| f.write(xls_data.string) }
-    render plain: "Создан новый прайс  #{@file_path}"
+    puts "Создан новый прайс  #{@file_path}"
+
   end
 
   def grouped_vidceny
@@ -134,10 +135,8 @@ class ApiController < ApplicationController
     # Здесь указываете email получателя
     recipient_email = 'svv@invelta.com.ua'
 
-
     # Отправляем письмо с вложением
     MyMailer.send_email_with_attachment(recipient_email, file_path).deliver_now
-
 
     # Удалить временный файл
     File.delete(@file_path) if File.exist?(@file_path)
