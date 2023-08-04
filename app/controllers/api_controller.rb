@@ -44,22 +44,19 @@ class ApiController < ApplicationController
     import_data_load
     render plain: @msg_data_load
 
-    # export_to_xls
-    # generate_and_send_email
-
   end
 
   def import_data_load
-    params_table = [{table_name:'products', url:'http://192.168.3.14/erp_main/hs/price/noma/', table_key: :Product},
-                    {table_name:'leftovers', url:'http://192.168.3.14/erp_main/hs/price/ostatki/', table_key: :Leftover},
-                    {table_name:'prices', url:'http://192.168.3.14/erp_main/hs/price/prices/', table_key: :Price},
-                    {table_name:'partners', url:'http://192.168.3.14/erp_main/hs/price/kontragent/', table_key: :Partner},
+    params_table = [{ table_name: 'products', url: 'http://192.168.3.14/erp_main/hs/price/noma/', table_key: :Product },
+                    { table_name: 'leftovers', url: 'http://192.168.3.14/erp_main/hs/price/ostatki/', table_key: :Leftover },
+                    { table_name: 'prices', url: 'http://192.168.3.14/erp_main/hs/price/prices/', table_key: :Price },
+                    { table_name: 'partners', url: 'http://192.168.3.14/erp_main/hs/price/kontragent/', table_key: :Partner },
     ]
 
-    params_table.each  do | el |
+    params_table.each do |el|
       max_update_date = el[:table_key].to_s.capitalize.singularize.constantize.maximum(:updated_at)
 
-      if max_update_date && max_update_date.to_date > Date.current
+      if max_update_date && max_update_date.to_date == Date.current
         @msg_data_load_select = "Данные #{el[:table_key].to_s} были загружены  #{max_update_date} и не требуют обновления \n"
         puts @msg_data_load_select
         @msg_data_load += @msg_data_load_select
@@ -76,18 +73,22 @@ class ApiController < ApplicationController
     ActiveRecord::Base.connection.execute("UPDATE leftovers SET Sklad = REPLACE(Sklad, ')', '') WHERE Sklad LIKE '%)%'")
   end
 
-
+  def create_xls
+    export_to_xls
+    render plain: "Создан новый прайс  #{@file_path}"
+  end
 
   def export_to_xls
 
     set_sheet_params
 
     # Получить хеш с для построения запроса
-    hash_with_params_sklad = hash_query_params_all(@skl, @grup, @podrazdel, @price, @product, @max_count)
+    hash_with_params_sklad = hash_query_params_all(@skl, @grup, @podrazdel, @price, @product, @max_count, @sheet_select)
 
     results = build_leftovers_combined_query(hash_with_params_sklad)
-    grouped_results = results.group(:artikul)
-                             .select( hash_grouped_name_collumns(hash_with_params_sklad)[:attr_query])
+
+    grouped_results = results.group(:artikul, :Tovar_Kategoriya)
+                             .select(hash_grouped_name_collumns(hash_with_params_sklad)[:attr_query])
 
     # Создание объекта для XLS-файла
     xls_file = Spreadsheet::Workbook.new
@@ -122,7 +123,6 @@ class ApiController < ApplicationController
       end
     end
 
-
     xls_data = StringIO.new
     xls_file.write xls_data
 
@@ -140,12 +140,16 @@ class ApiController < ApplicationController
   def set_sheet_params
     # временные переменные, заменить на получаемые по API
     @sheet_name = "Легковая шина"
-    @skl = ['Винница ОСПП оптовый склад','Главный склад Днепр  оптовый склад'].uniq
+    @skl = ['Винница ОСПП оптовый склад', 'Главный склад Днепр  оптовый склад'].uniq
     @grup = ['ОСПП и ТСС', 'РОЗНИЦА'].uniq
     @podrazdel = ["ТСЦ-04 К (Киев, Оболонь)"].uniq
     @price = ["Интернет", "Мин", "Опт", "Спец С", "Интернет", "Мин", "Опт", "Спец С"].uniq
-    @product = ["id","Artikul","Nomenklatura", "Ves", "Artikul","Nomenklatura", "Ves", "Proizvoditel", "VidNomenklatury", "TipTovara", "TovarnayaKategoriya"].uniq
+    @product = ["id", "Artikul", "Nomenklatura", "Ves", "Artikul", "Nomenklatura", "Ves", "Proizvoditel", "VidNomenklatury", "TipTovara", "TovarnayaKategoriya"].uniq
     @max_count = 20
+    @sheet_select = {
+      # TovarnayaKategoriya: [ 'Сельхоз отечественный', 'шины грузовые комбинированные', 'Шина с регулируемым Давлением'],
+      VidNomenklatury: ['грузовые', 'легковые', 'регулируемое давление']
+    }
   end
 
   def generate_and_send_email
@@ -172,7 +176,7 @@ class ApiController < ApplicationController
     @msg_data_load = ""
     # Вывести email-адреса получателей
     deliveries.each do |delivery|
-      @msg_data_load_select = " #{delivery.to } #{" "*20} время: #{delivery.created_at } \n"
+      @msg_data_load_select = " #{delivery.to } #{" " * 20} время: #{delivery.created_at } \n"
       @msg_data_load += @msg_data_load_select
       puts @msg_data_load_select
     end

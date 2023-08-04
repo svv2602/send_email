@@ -1,15 +1,16 @@
 module ResponseAggregator
 
-  def hash_query_params_all(skl, grup, podrazdel, price, product, max_count)
+  def hash_query_params_all(skl, grup, podrazdel, price, product, max_count, sheet_select)
     array_query1_where = []
     array_query2_where = []
     array_query1_select = []
     array_query2_select = []
+    array_query_where_products = []
     array_name = []
     array_name_sum = []
 
     # обработка списка складов
-    hash = { Sklad: skl, GruppaSkladov: grup , Podrazdelenie: podrazdel}
+    hash = { Sklad: skl, GruppaSkladov: grup, Podrazdelenie: podrazdel }
     hash.each do |key, value|
       strSQL = "Leftovers.#{key.to_s}"
 
@@ -28,6 +29,7 @@ module ResponseAggregator
           array_query2_select << "0 as Field_#{array_name_sum.index(element)}"
         end
       end
+
     end
 
     # Обработка списка цен
@@ -49,9 +51,24 @@ module ResponseAggregator
       end
     end
 
+    str_array_query1_where = "(#{array_query1_where.join(' OR ')})"
+    str_array_query2_where = "(#{array_query2_where.join(' OR ')})"
+
+    # обработка критериев отбора по листу
+    sheet_select.each do |key, value|
+      if value.is_a?(Array) && !value.empty?
+        arr = []
+        value.each do |element|
+          arr << "products.#{key.to_s} = '#{element}' "
+        end
+        str_array_query1_where += " AND (#{arr.join(' OR ')})"
+        str_array_query2_where += " AND (#{arr.join(' OR ')})"
+      end
+    end
+
     hash_result = {
-      array_query1_where: array_query1_where.join(' OR '),
-      array_query2_where: array_query2_where.join(' OR '),
+      array_query1_where: str_array_query1_where,
+      array_query2_where: str_array_query2_where,
       array_query1_select: array_query1_select.join(' , '),
       array_query2_select: array_query2_select.join(' , '),
       array_name: array_name,
@@ -66,15 +83,15 @@ module ResponseAggregator
     strSql = 'products.*'
 
     leftover_query = Leftover.joins(:product)
-                             .select("Leftovers.Artikul as artikul,
+                             .select("Leftovers.Artikul as artikul, products.TovarnayaKategoriya as Tovar_Kategoriya,
                                     #{@params_sklad[:array_query1_select]}")
-                             .where("#{@params_sklad[:array_query1_where]}")
+                             .where("(#{@params_sklad[:array_query1_where]})")
                              .group("Leftovers.Artikul, products.TovarnayaKategoriya")
 
     price_query = Price.joins(:product)
-                       .select("Prices.Artikul as artikul,
+                       .select("Prices.Artikul as artikul, products.TovarnayaKategoriya as Tovar_Kategoriya,
                               #{@params_sklad[:array_query2_select]}")
-                       .where("#{@params_sklad[:array_query2_where]}")
+                       .where("(#{@params_sklad[:array_query2_where]})")
                        .group("Prices.Artikul, products.TovarnayaKategoriya")
 
     @combined_results = Leftover.from("(#{leftover_query.to_sql} UNION #{price_query.to_sql}) AS leftovers_combined")
@@ -83,7 +100,7 @@ module ResponseAggregator
   end
 
   def hash_grouped_name_collumns(hash_with_params)
-    attr_query = ["artikul"]
+    attr_query = ["artikul", "Tovar_Kategoriya"]
     attr_query_name_collumn = []
 
     hash_with_params[:array_name].each do |el|
