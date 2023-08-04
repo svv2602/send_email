@@ -1,6 +1,6 @@
 module ResponseAggregator
 
-  def hash_query_params_all(skl, grup, price, product, max_count)
+  def hash_query_params_all(skl, grup, podrazdel, price, product, max_count)
     array_query1_where = []
     array_query2_where = []
     array_query1_select = []
@@ -9,9 +9,18 @@ module ResponseAggregator
     array_name_sum = []
 
     # обработка списка складов
-    hash = { Sklad: skl, GruppaSkladov: grup }
+    hash = { Sklad: skl, GruppaSkladov: grup , Podrazdelenie: podrazdel}
     hash.each do |key, value|
-      strSQL = key == :Sklad ? "Leftovers.Sklad" : "Leftovers.GruppaSkladov"
+      case key
+      when :Sklad
+        strSQL = "Leftovers.Sklad"
+      when :GruppaSkladov
+        strSQL = "Leftovers.GruppaSkladov"
+      when :Podrazdelenie
+        strSQL = "Leftovers.Podrazdelenie"
+      end
+
+      # strSQL = key == :Sklad ? "Leftovers.Sklad" : "Leftovers.GruppaSkladov"
 
       if value.is_a?(Array) && !value.empty?
         value.each do |element|

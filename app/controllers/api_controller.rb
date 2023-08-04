@@ -83,7 +83,7 @@ class ApiController < ApplicationController
     set_sheet_params
 
     # Получить хеш с для построения запроса
-    hash_with_params_sklad = hash_query_params_all(@skl, @grup, @price, @product, @max_count)
+    hash_with_params_sklad = hash_query_params_all(@skl, @grup, @podrazdel, @price, @product, @max_count)
 
     results = build_leftovers_combined_query(hash_with_params_sklad)
     grouped_results = results.group(:artikul)
