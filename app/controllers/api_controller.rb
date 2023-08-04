@@ -42,7 +42,7 @@ class ApiController < ApplicationController
   def import_data_from_api
     @msg_data_load = ""
     import_data_load
-    render plain: @msg_data_load
+    render plain: @msg_data_load + "\n #{Time.now}"
 
   end
 
@@ -75,11 +75,10 @@ class ApiController < ApplicationController
 
   def create_xls
     export_to_xls
-    render plain: "Создан новый прайс  #{@file_path}"
+    render plain: "Создан новый прайс  #{@file_path} \n #{Time.now}"
   end
 
   def export_to_xls
-
     set_sheet_params
 
     # Получить хеш с для построения запроса
@@ -129,7 +128,7 @@ class ApiController < ApplicationController
     # Сохраняем файл на сервере
     @file_path = "#{Rails.root}/tmp/leftovers_with_properties.xls"
     File.open(@file_path, 'wb') { |f| f.write(xls_data.string) }
-    puts "Создан новый прайс  #{@file_path}"
+    puts "Создан новый прайс  #{@file_path} \n #{Time.now}"
 
   end
 
@@ -147,7 +146,7 @@ class ApiController < ApplicationController
     @product = ["id", "Artikul", "Nomenklatura", "Ves", "Artikul", "Nomenklatura", "Ves", "Proizvoditel", "VidNomenklatury", "TipTovara", "TovarnayaKategoriya"].uniq
     @max_count = 20
     @sheet_select = {
-      # TovarnayaKategoriya: [ 'Сельхоз отечественный', 'шины грузовые комбинированные', 'Шина с регулируемым Давлением'],
+      TovarnayaKategoriya: ['Сельхоз отечественный', 'шины грузовые комбинированные', 'Bridgestone'],
       VidNomenklatury: ['грузовые', 'легковые', 'регулируемое давление']
     }
   end
@@ -181,7 +180,7 @@ class ApiController < ApplicationController
       puts @msg_data_load_select
     end
 
-    render plain: @msg_data_load
+    render plain: @msg_data_load + "\n #{Time.now}"
   end
 
   def delete_old_emails

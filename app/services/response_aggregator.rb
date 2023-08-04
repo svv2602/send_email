@@ -5,7 +5,6 @@ module ResponseAggregator
     array_query2_where = []
     array_query1_select = []
     array_query2_select = []
-    array_query_where_products = []
     array_name = []
     array_name_sum = []
 
@@ -51,10 +50,14 @@ module ResponseAggregator
       end
     end
 
+    # Массивы преобразовываем в строку
     str_array_query1_where = "(#{array_query1_where.join(' OR ')})"
     str_array_query2_where = "(#{array_query2_where.join(' OR ')})"
+    str_array_query1_select = array_query1_select.join(' , ')
+    str_array_query2_select = array_query2_select.join(' , ')
 
-    # обработка критериев отбора по листу
+
+    # обработка критериев отбора по листу и добавление их в итоговую строку отбора
     sheet_select.each do |key, value|
       if value.is_a?(Array) && !value.empty?
         arr = []
@@ -69,8 +72,8 @@ module ResponseAggregator
     hash_result = {
       array_query1_where: str_array_query1_where,
       array_query2_where: str_array_query2_where,
-      array_query1_select: array_query1_select.join(' , '),
-      array_query2_select: array_query2_select.join(' , '),
+      array_query1_select: str_array_query1_select,
+      array_query2_select: str_array_query2_select,
       array_name: array_name,
       array_name_sum: array_name_sum,
       array_name_sklad: array_name + array_name_sum
@@ -118,28 +121,3 @@ module ResponseAggregator
   end
 
 end
-
-class MyClass
-  include ResponseAggregator
-end
-
-# price = ["Интернет", "Маг", "Маг1", "Маг2", "Маг3", "Маг4", "Мин", "Опт",
-#          "Розница", "Спец", "Спец А", "Спец Б", "Спец С", "Тендер"]
-# skl = ['Винница ОСПП оптовый склад', 'Главный склад Днепр  оптовый склад']
-# grup = ['ОСПП и ТСС', 'РОЗНИЦА']
-# product = ["id", "Artikul", "Nomenklatura", "Ves", "Proizvoditel", "VidNomenklatury", "TipTovara", "TovarnayaKategoriya"]
-#
-# d = MyClass.new
-# result = d.hash_query_params_all(skl, grup, price, product)
-# hash_with_params_sklad = result
-# puts "Debug" + "=" * 100
-# puts d.hash_grouped_name_collumns(hash_with_params_sklad)[:attr_query]
-
-puts "=" * 100
-# puts "array_query1_select : #{result[:array_name_sklad]}"
-puts "=" * 100
-
-# array_query1_where = []
-# array_query1_select = []
-# array_query2_select = []
-# array_name_sklad = []
