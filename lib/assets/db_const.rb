@@ -31,7 +31,8 @@ DB_COLUMNS = {
     SkladKod: "СкладКод",
     Kolichestvo: "Количество",
     GruppaSkladov: "ГруппаСкладов",
-    Gorod: "Город"
+    Gorod: "Город",
+    Podrazdelenie: "Подразделение"
   },
 
   Price: {
@@ -47,6 +48,9 @@ DB_COLUMNS = {
     OsnovnoiMeneger: "ОсновнойМенеджер",
     TelefonPodrazdeleniia: "ТелефонПодразделения",
     Gorod: "Город",
+    TipKontragentaILSh: "ТипКонтрагентаИЛШ",
+    TipKontragentaCMK: "ТипКонтрагентаЦМК",
+    TipKontragentaSHOP: "ТипКонтрагентаШОП",
     Podrazdelenie: "Подразделение"
   }
 }

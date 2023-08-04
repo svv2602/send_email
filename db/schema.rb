@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2023_08_03_130750) do
+ActiveRecord::Schema[7.0].define(version: 2023_08_04_124516) do
   create_table "emails", force: :cascade do |t|
     t.string "to"
     t.string "subject"
@@ -29,6 +29,7 @@ ActiveRecord::Schema[7.0].define(version: 2023_08_03_130750) do
     t.text "Gorod", default: ""
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "Podrazdelenie", default: ""
   end
 
   create_table "partners", force: :cascade do |t|
@@ -41,6 +42,9 @@ ActiveRecord::Schema[7.0].define(version: 2023_08_03_130750) do
     t.text "Podrazdelenie", default: ""
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "TipKontragentaILSh", default: ""
+    t.string "TipKontragentaCMK", default: ""
+    t.string "TipKontragentaSHOP", default: ""
   end
 
   create_table "prices", force: :cascade do |t|
