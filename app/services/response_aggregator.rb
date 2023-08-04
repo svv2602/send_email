@@ -11,16 +11,7 @@ module ResponseAggregator
     # обработка списка складов
     hash = { Sklad: skl, GruppaSkladov: grup , Podrazdelenie: podrazdel}
     hash.each do |key, value|
-      case key
-      when :Sklad
-        strSQL = "Leftovers.Sklad"
-      when :GruppaSkladov
-        strSQL = "Leftovers.GruppaSkladov"
-      when :Podrazdelenie
-        strSQL = "Leftovers.Podrazdelenie"
-      end
-
-      # strSQL = key == :Sklad ? "Leftovers.Sklad" : "Leftovers.GruppaSkladov"
+      strSQL = "Leftovers.#{key.to_s}"
 
       if value.is_a?(Array) && !value.empty?
         value.each do |element|
