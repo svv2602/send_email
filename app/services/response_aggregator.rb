@@ -1,5 +1,20 @@
 module ResponseAggregator
 
+  def set_sheet_params
+    # временные переменные, заменить на получаемые по API
+    @sheet_name = "Легковая шина"
+    @skl = ['Винница ОСПП оптовый склад', 'Главный склад Днепр  оптовый склад'].uniq
+    @grup = ['ОСПП и ТСС', 'РОЗНИЦА'].uniq
+    @podrazdel = ["ТСЦ-04 К (Киев, Оболонь)"].uniq
+    @price = ["Интернет", "Мин", "Опт", "Спец С", "Интернет", "Мин", "Опт", "Спец С"].uniq
+    @product = ["id", "Artikul", "Nomenklatura", "Ves", "Artikul", "Nomenklatura", "Ves", "Proizvoditel", "VidNomenklatury", "TipTovara", "TovarnayaKategoriya"].uniq
+    @max_count = 20
+    @sheet_select = {
+      TovarnayaKategoriya: ['Сельхоз отечественный', 'шины грузовые комбинированные', 'Bridgestone'],
+      VidNomenklatury: ['грузовые', 'легковые', 'регулируемое давление']
+    }
+  end
+
   def hash_query_params_all(skl, grup, podrazdel, price, product, max_count, sheet_select)
     array_query1_where = []
     array_query2_where = []
