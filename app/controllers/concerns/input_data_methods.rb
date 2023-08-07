@@ -38,10 +38,10 @@ module InputDataMethods
 
     def params_table
       [
-        # { table_name: 'products', url: 'http://192.168.3.14/erp_main/hs/price/noma/', table_key: :Product },
-        # { table_name: 'leftovers', url: 'http://192.168.3.14/erp_main/hs/price/ostatki/', table_key: :Leftover },
+        { table_name: 'products', url: 'http://192.168.3.14/erp_main/hs/price/noma/', table_key: :Product },
+        { table_name: 'leftovers', url: 'http://192.168.3.14/erp_main/hs/price/ostatki/', table_key: :Leftover },
         { table_name: 'prices', url: 'http://192.168.3.14/erp_main/hs/price/prices/', table_key: :Price },
-        # { table_name: 'partners', url: 'http://192.168.3.14/erp_main/hs/price/kontragent/', table_key: :Partner },
+        { table_name: 'partners', url: 'http://192.168.3.14/erp_main/hs/price/kontragent/', table_key: :Partner },
       ]
     end
 

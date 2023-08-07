@@ -6,8 +6,15 @@ class MyMailer < ApplicationMailer
   def send_email_with_attachment(email, file_path)
     date = Date.today
     formatted_date = date.strftime('%d_%m_%Y')
+
     attachments["price#{formatted_date}.xls"] = File.read(file_path)
-    mail(to: email, subject: "price #{formatted_date}")
+    unsubscribe_url = "https://www.tot.biz.ua/unsubscribe?email=#{email}"
+
+    mail(to: email, subject: "price #{formatted_date}") do |format|
+      format.html {
+        render locals: { unsubscribe_url: unsubscribe_url }
+      }
+    end
   end
 
   private

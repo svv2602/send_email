@@ -85,12 +85,12 @@ class ApiController < ApplicationController
     # Здесь указываете email получателя
     recipient_email = 'svv@invelta.com.ua'
     #==============================================================
-    ## Отправляем письмо с вложением
-    ## Заблочено - раскомментировать для отправки
-    # MyMailer.send_email_with_attachment(recipient_email, file_path).deliver_now
+    # Отправляем письмо с вложением
+    # Заблочено - раскомментировать для отправки
+    MyMailer.send_email_with_attachment(recipient_email, file_path).deliver_now
 
-    ## Удалить временный файл
-    # File.delete(@file_path) if File.exist?(@file_path)
+    # Удалить временный файл
+    File.delete(@file_path) if File.exist?(@file_path)
     #==============================================================
 
     # Отображаем результат пользователю
