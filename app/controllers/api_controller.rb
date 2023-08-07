@@ -1,21 +1,18 @@
 require 'httparty'
-require_relative '../../lib/assets/db_const'
+# require_relative '../../lib/assets/db_const'
 require 'spreadsheet'
-require_relative '../services/response_aggregator'
 
 class ApiController < ApplicationController
   include DataAccessMethods
   include InputDataMethods
-  include ResponseAggregator
+  include ResponseAggregatorMethods
   after_action :delete_old_emails, only: :import_data_from_api
-
 
   def import_data_from_api
     @msg_data_load = ""
     import_data_load
     render plain: @msg_data_load + "\n #{Time.now}"
   end
-
 
   def create_xls
     export_to_xls
@@ -79,7 +76,6 @@ class ApiController < ApplicationController
   def grouped_vidceny
     Price.group(:Vidceny).order(:Vidceny).pluck(:Vidceny)
   end
-
 
 
   def generate_and_send_email

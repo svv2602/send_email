@@ -1,24 +1,17 @@
 # README
 
-This README would normally document whatever steps are necessary to get the
-application up and running.
+### Приложение для рассылки прайсов
 
-Things you may want to cover:
+### Настройка в app/controllers/concerns/input_data_methods.rb
+* адреса API для загрузки в прописаны  в `params_table`
+* соответствие названий столбцов в базе данных столбцам API в `db_columns`
 
-* Ruby version
+Внимание! При необходимости добавить:
 
-* System dependencies
+* новое поле из API в базу данных  - нужно сделать новую  миграцию и и установить соответствие в `db_columns`  
+* добавить новую таблицу из API в базу данных  - нужно нужно сделать новую  миграцию, добавить новый элемент в `db_columns` и установить соответствие названий, внести данные в `params_table`
 
-* Configuration
 
-* Database creation
 
-* Database initialization
-
-* How to run the test suite
-
-* Services (job queues, cache servers, search engines, etc.)
-
-* Deployment instructions
 
 * ...
