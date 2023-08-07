@@ -47,22 +47,24 @@ class ApiController < ApplicationController
   end
 
   def import_data_load
-    params_table = [{ table_name: 'products', url: 'http://192.168.3.14/erp_main/hs/price/noma/', table_key: :Product },
-                    { table_name: 'leftovers', url: 'http://192.168.3.14/erp_main/hs/price/ostatki/', table_key: :Leftover },
-                    { table_name: 'prices', url: 'http://192.168.3.14/erp_main/hs/price/prices/', table_key: :Price },
-                    { table_name: 'partners', url: 'http://192.168.3.14/erp_main/hs/price/kontragent/', table_key: :Partner },
+    params_table = [
+      { table_name: 'products', url: 'http://192.168.3.14/erp_main/hs/price/noma/', table_key: :Product },
+      { table_name: 'leftovers', url: 'http://192.168.3.14/erp_main/hs/price/ostatki/', table_key: :Leftover },
+      { table_name: 'prices', url: 'http://192.168.3.14/erp_main/hs/price/prices/', table_key: :Price },
+      { table_name: 'partners', url: 'http://192.168.3.14/erp_main/hs/price/kontragent/', table_key: :Partner },
     ]
 
     params_table.each do |el|
       max_update_date = el[:table_key].to_s.capitalize.singularize.constantize.maximum(:updated_at)
 
-      if max_update_date && max_update_date.to_date == Date.current
+      if max_update_date && max_update_date.to_date > Date.current
         @msg_data_load_select = "Данные #{el[:table_key].to_s} были загружены  #{max_update_date} и не требуют обновления \n"
         puts @msg_data_load_select
         @msg_data_load += @msg_data_load_select
       else
         import_data_from_api_select(el[:table_name], el[:url], el[:table_key])
         bracket_replacement if el[:table_name] == 'leftovers' # Убрать скобки в названиях складов
+        type_replacement if el[:table_name] == 'partners' # Удалить тип прайса, если нет менеджера
       end
     end
 
@@ -71,6 +73,22 @@ class ApiController < ApplicationController
   def bracket_replacement
     ActiveRecord::Base.connection.execute("UPDATE leftovers SET Sklad = REPLACE(Sklad, '(', '') WHERE Sklad LIKE '%(%'")
     ActiveRecord::Base.connection.execute("UPDATE leftovers SET Sklad = REPLACE(Sklad, ')', '') WHERE Sklad LIKE '%)%'")
+  end
+
+  def type_replacement
+    ActiveRecord::Base.connection.execute("UPDATE partners SET TipKontragentaILSh = '' WHERE OsnovnoiMeneger LIKE ''")
+    ActiveRecord::Base.connection.execute("UPDATE partners SET TipKontragentaCMK = '' WHERE OsnovnoiMeneger LIKE ''")
+    ActiveRecord::Base.connection.execute("UPDATE partners SET TipKontragentaSHOP = '' WHERE OsnovnoiMeneger LIKE ''")
+
+    # Получаем всех партнеров, у которых поле Email не пустое
+    partners_with_email = Partner.where.not(Email: nil)
+
+    # Обновляем поле Email для каждого партнера, оставляя только адреса
+    partners_with_email.each do |partner|
+      email = partner.Email.scan(/\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}\b/).join(', ')
+      partner.update(Email: email)
+    end
+
   end
 
   def create_xls
@@ -157,12 +175,14 @@ class ApiController < ApplicationController
 
     # Здесь указываете email получателя
     recipient_email = 'svv@invelta.com.ua'
+    #==============================================================
+    ## Отправляем письмо с вложением
+    ## Заблочено - раскомментировать для отправки
+    # MyMailer.send_email_with_attachment(recipient_email, file_path).deliver_now
 
-    # Отправляем письмо с вложением
-    MyMailer.send_email_with_attachment(recipient_email, file_path).deliver_now
-
-    # Удалить временный файл
-    File.delete(@file_path) if File.exist?(@file_path)
+    ## Удалить временный файл
+    # File.delete(@file_path) if File.exist?(@file_path)
+    #==============================================================
 
     # Отображаем результат пользователю
     render plain: 'Email sent successfully!'
@@ -187,6 +207,51 @@ class ApiController < ApplicationController
     days_ago = 30.days.ago
     Email.where('created_at < ?', days_ago).destroy_all
     puts "Удалены все записи из Email, старше #{days_ago} дней."
+  end
+
+  def params_price_partner
+    price_query = Partner.select("TipKontragentaILSh || ',' || TipKontragentaCMK || ',' || TipKontragentaSHOP || ',' || Gorod as params
+       ")
+                         .group("params")
+
+    # Выполнить запрос и получить результаты в виде объектов ActiveRecord
+    results = price_query.all
+    puts results
+
+    # Преобразовать результаты в строку для отображения с помощью render plain
+    result_string = results.map { |result| "#{result.params}" }.join("\n")
+
+    # Отрендерить результаты в виде простого текста
+    render plain: result_string
+  end
+
+  def grup_partner
+    price_query = Partner.select("OsnovnoiMeneger as OsnovnoiMeneger,
+       Email as Email,
+       TipKontragentaILSh as TipKontragentaILSh,
+       TipKontragentaCMK as TipKontragentaCMK,
+       TipKontragentaSHOP as TipKontragentaSHOP,
+       TipKontragentaILSh || ',' || TipKontragentaCMK || ',' || TipKontragentaSHOP || ',' || Gorod as params
+       ")
+                         .where("Email != ''")
+                         .group("OsnovnoiMeneger,
+       Email,
+       TipKontragentaILSh,
+       TipKontragentaCMK,
+       TipKontragentaSHOP,
+       params
+       ")
+                         .order("params")
+
+    # Выполнить запрос и получить результаты в виде объектов ActiveRecord
+    results = price_query.all
+    puts results
+
+    # Преобразовать результаты в строку для отображения с помощью render plain
+    result_string = results.map { |result| "#{result.OsnovnoiMeneger},#{result.Email}, #{result.TipKontragentaILSh}, #{result.TipKontragentaCMK}, #{result.TipKontragentaSHOP}" }.join("\n")
+
+    # Отрендерить результаты в виде простого текста
+    render plain: result_string
   end
 
 end

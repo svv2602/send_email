@@ -120,4 +120,6 @@ module ResponseAggregator
     hash_grouped = { attr_query_name_collumn: attr_query_name_collumn, attr_query: attr_query }
   end
 
+
+
 end
