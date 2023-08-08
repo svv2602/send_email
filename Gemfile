@@ -80,4 +80,4 @@ gem "activerecord", "~> 7.0"
 
 gem "spreadsheet", "~> 1.3"
 
-
+gem 'redcarpet'

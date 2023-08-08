@@ -5,5 +5,5 @@ Rails.application.routes.draw do
   get 'report', to: 'api#report_email'
   get 'grup', to: 'api#grup_partner'
   get 'attr', to: 'api#params_price_partner'
-
+  root 'readme#show'
 end
