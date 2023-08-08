@@ -14,7 +14,7 @@ class ApiController < ApplicationController
   end
 
   def create_xls
-    if list_partners_to_send_email?
+    if list_partners_to_send_email.any?
       export_to_xls
       render plain: "Создан новый прайс  #{@file_path} \n #{Time.now}"
     else
@@ -132,13 +132,12 @@ class ApiController < ApplicationController
       # Например, вы можете использовать эти значения для отправки писем или других действий
       puts "OsnovnoiMeneger: #{osnovnoi_meneger}, Email: #{email}, TipKontragentaILSh: #{tip_kontragenta_ilsh}, TipKontragentaCMK: #{tip_kontragenta_cmk}, TipKontragentaSHOP: #{tip_kontragenta_shop}, Podrazdelenie: #{podrazdelenie}"
       Email.create(to: email, subject: "прайс№ #{kol}", body: "OsnovnoiMeneger: #{osnovnoi_meneger}, Podrazdelenie: #{podrazdelenie}", delivered: true)
-      i +=1
+      i += 1
     end
 
     render plain: "Сделано #{kol} разa для  #{i} записей"
 
   end
-
 
   def report_email
     # Получить все успешно доставленные письма за последние 7 дней
@@ -147,8 +146,9 @@ class ApiController < ApplicationController
 
     @msg_data_load = ""
     # Вывести email-адреса получателей
-    deliveries.each_with_index  do |delivery, i|
-      @msg_data_load_select = "#{i+1}: #{delivery.created_at } #{" " * 20} #{delivery.to }\n"
+    deliveries.each_with_index do |delivery, i|
+      ind = i < 10 ** 10 ? 11 - (i + 1).to_s.length.to_i : 1
+      @msg_data_load_select = "#{i + 1}: #{delivery.created_at } #{" " * ind} #{delivery.to }; #{delivery.body }\n"
       @msg_data_load += @msg_data_load_select
       puts @msg_data_load_select
     end

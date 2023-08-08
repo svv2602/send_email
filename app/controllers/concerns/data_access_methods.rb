@@ -40,8 +40,8 @@ module DataAccessMethods
       # ORDER BY params;
       #   SQL
 
-      # В запросе дублируемые email объединяются в один
-      # типы прайсов складываются
+      # В запросе дублируемые email объединяются в один 
+      # типы пра
       sql_query = <<-SQL
 SELECT partners_select.*,
        TipKontragentaILSh || ',' || TipKontragentaCMK || ',' || TipKontragentaSHOP || ',' || Podrazdelenie as params
@@ -88,9 +88,9 @@ ORDER BY params;
 
     end
 
-    def list_partners_to_send_email?
-      list_partners_to_send_email.any?
-    end
+    # def list_partners_to_send_email?
+    #   list_partners_to_send_email.any?
+    # end
 
   end
 end
