@@ -14,7 +14,7 @@ class ApiController < ApplicationController
   end
 
   def create_xls
-    if !list_partners_to_send_email?
+    if list_partners_to_send_email?
       export_to_xls
       render plain: "Создан новый прайс  #{@file_path} \n #{Time.now}"
     else
@@ -77,9 +77,9 @@ class ApiController < ApplicationController
 
   end
 
-  def grouped_vidceny
-    Price.group(:Vidceny).order(:Vidceny).pluck(:Vidceny)
-  end
+  # def grouped_vidceny
+  #   Price.group(:Vidceny).order(:Vidceny).pluck(:Vidceny)
+  # end
 
   def generate_and_send_email
     export_to_xls
@@ -100,22 +100,6 @@ class ApiController < ApplicationController
     render plain: 'Email sent successfully!'
   end
 
-  def report_email
-    # Получить все успешно доставленные письма за последние 7 дней
-    # deliveries = Email.where('created_at > ?', Time.now - 7.days)
-    deliveries = Email.where("DATE(emails.created_at) = DATE('now')")
-
-    @msg_data_load = ""
-    # Вывести email-адреса получателей
-    deliveries.each_with_index  do |delivery, i|
-      @msg_data_load_select = "#{i+1}: #{delivery.created_at } #{" " * 20} #{delivery.to }\n"
-      @msg_data_load += @msg_data_load_select
-      puts @msg_data_load_select
-    end
-
-    render plain: "Список рассылок email за сегодня:\n\n" + @msg_data_load + "\nОтчет создан: #{Time.now}"
-  end
-
   def delete_old_emails
     days_ago = 30.days.ago
     Email.where('created_at < ?', days_ago).destroy_all
@@ -123,14 +107,14 @@ class ApiController < ApplicationController
   end
 
   def grup_partner
+    # Email.delete_all
     results = list_partners_to_send_email
     kol = 0
     i = 0
     params = nil
+
     # Обработка результатов
     results.each do |row|
-
-      # Здесь вы можете использовать значения из каждой строки row
       osnovnoi_meneger = row["OsnovnoiMeneger"]
       email = row["Email"]
       tip_kontragenta_ilsh = row["TipKontragentaILSh"]
@@ -147,11 +131,29 @@ class ApiController < ApplicationController
       # Ваш код обработки для каждой строки
       # Например, вы можете использовать эти значения для отправки писем или других действий
       puts "OsnovnoiMeneger: #{osnovnoi_meneger}, Email: #{email}, TipKontragentaILSh: #{tip_kontragenta_ilsh}, TipKontragentaCMK: #{tip_kontragenta_cmk}, TipKontragentaSHOP: #{tip_kontragenta_shop}, Podrazdelenie: #{podrazdelenie}"
+      Email.create(to: email, subject: "прайс№ #{kol}", body: "OsnovnoiMeneger: #{osnovnoi_meneger}, Podrazdelenie: #{podrazdelenie}", delivered: true)
       i +=1
     end
 
     render plain: "Сделано #{kol} разa для  #{i} записей"
 
+  end
+
+
+  def report_email
+    # Получить все успешно доставленные письма за последние 7 дней
+    # deliveries = Email.where('created_at > ?', Time.now - 7.days)
+    deliveries = Email.where("DATE(emails.created_at) = DATE('now')")
+
+    @msg_data_load = ""
+    # Вывести email-адреса получателей
+    deliveries.each_with_index  do |delivery, i|
+      @msg_data_load_select = "#{i+1}: #{delivery.created_at } #{" " * 20} #{delivery.to }\n"
+      @msg_data_load += @msg_data_load_select
+      puts @msg_data_load_select
+    end
+
+    render plain: "Список рассылок email за сегодня:\n\n" + @msg_data_load + "\nОтчет создан: #{Time.now}"
   end
 
 end
