@@ -1,5 +1,4 @@
 require 'httparty'
-# require_relative '../../lib/assets/db_const'
 require 'spreadsheet'
 
 class ApiController < ApplicationController
@@ -15,8 +14,13 @@ class ApiController < ApplicationController
   end
 
   def create_xls
-    export_to_xls
-    render plain: "Создан новый прайс  #{@file_path} \n #{Time.now}"
+    if !list_partners_to_send_email?
+      export_to_xls
+      render plain: "Создан новый прайс  #{@file_path} \n #{Time.now}"
+    else
+      render plain: "Список клиентов пуст. Вы скорее всего уже сделали рассылку \n Проверьте отчет о рассылке `/report`"
+    end
+
   end
 
   def export_to_xls
@@ -98,17 +102,18 @@ class ApiController < ApplicationController
 
   def report_email
     # Получить все успешно доставленные письма за последние 7 дней
-    deliveries = Email.where('created_at > ?', Time.now - 7.days)
+    # deliveries = Email.where('created_at > ?', Time.now - 7.days)
+    deliveries = Email.where("DATE(emails.created_at) = DATE('now')")
 
     @msg_data_load = ""
     # Вывести email-адреса получателей
-    deliveries.each do |delivery|
-      @msg_data_load_select = " #{delivery.to } #{" " * 20} время: #{delivery.created_at } \n"
+    deliveries.each_with_index  do |delivery, i|
+      @msg_data_load_select = "#{i+1}: #{delivery.created_at } #{" " * 20} #{delivery.to }\n"
       @msg_data_load += @msg_data_load_select
       puts @msg_data_load_select
     end
 
-    render plain: @msg_data_load + "\n #{Time.now}"
+    render plain: "Список рассылок email за сегодня:\n\n" + @msg_data_load + "\nОтчет создан: #{Time.now}"
   end
 
   def delete_old_emails

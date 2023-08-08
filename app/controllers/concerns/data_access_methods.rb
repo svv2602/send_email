@@ -40,8 +40,12 @@ module DataAccessMethods
     ORDER BY params;
       SQL
 
-      ActiveRecord::Base.connection.execute(sql_query)
+      results = ActiveRecord::Base.connection.execute(sql_query)
 
+    end
+
+    def list_partners_to_send_email?
+      list_partners_to_send_email.any?
     end
 
   end
