@@ -26,5 +26,23 @@ module DataAccessMethods
       end
     end
 
+    def list_partners_to_send_email
+      sql_query = <<-SQL
+    SELECT partners.*,
+           TipKontragentaILSh || ',' || TipKontragentaCMK || ',' || TipKontragentaSHOP || ',' || Podrazdelenie as params
+    FROM "partners"
+    LEFT JOIN (
+      SELECT emails.*
+      FROM "emails"
+      WHERE DATE("emails"."created_at") = DATE('now')
+    ) as "emails_date" ON "emails_date"."to" = "partners"."Email"
+    WHERE "emails_date"."to" IS NULL AND "partners"."Email" != ""
+    ORDER BY params;
+      SQL
+
+      ActiveRecord::Base.connection.execute(sql_query)
+
+    end
+
   end
 end

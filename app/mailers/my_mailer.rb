@@ -28,5 +28,6 @@ class MyMailer < ApplicationMailer
     Rails.logger.info("Email delivered successfully. Recipient: #{recipient}, Subject: #{subject}")
 
     Email.create(to: recipient, subject: subject, body: body, delivered: true)
+    puts "Create record email"
   end
 end

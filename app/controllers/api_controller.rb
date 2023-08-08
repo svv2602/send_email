@@ -77,7 +77,6 @@ class ApiController < ApplicationController
     Price.group(:Vidceny).order(:Vidceny).pluck(:Vidceny)
   end
 
-
   def generate_and_send_email
     export_to_xls
     file_path = @file_path
@@ -118,49 +117,36 @@ class ApiController < ApplicationController
     puts "Удалены все записи из Email, старше #{days_ago} дней."
   end
 
-  def params_price_partner
-    price_query = Partner.select("TipKontragentaILSh || ',' || TipKontragentaCMK || ',' || TipKontragentaSHOP || ',' || Gorod as params
-       ")
-                         .group("params")
-
-    # Выполнить запрос и получить результаты в виде объектов ActiveRecord
-    results = price_query.all
-    puts results
-
-    # Преобразовать результаты в строку для отображения с помощью render plain
-    result_string = results.map { |result| "#{result.params}" }.join("\n")
-
-    # Отрендерить результаты в виде простого текста
-    render plain: result_string
-  end
-
   def grup_partner
-    price_query = Partner.select("OsnovnoiMeneger as OsnovnoiMeneger,
-       Email as Email,
-       TipKontragentaILSh as TipKontragentaILSh,
-       TipKontragentaCMK as TipKontragentaCMK,
-       TipKontragentaSHOP as TipKontragentaSHOP,
-       TipKontragentaILSh || ',' || TipKontragentaCMK || ',' || TipKontragentaSHOP || ',' || Gorod as params
-       ")
-                         .where("Email != ''")
-                         .group("OsnovnoiMeneger,
-       Email,
-       TipKontragentaILSh,
-       TipKontragentaCMK,
-       TipKontragentaSHOP,
-       params
-       ")
-                         .order("params")
+    results = list_partners_to_send_email
+    kol = 0
+    i = 0
+    params = nil
+    # Обработка результатов
+    results.each do |row|
 
-    # Выполнить запрос и получить результаты в виде объектов ActiveRecord
-    results = price_query.all
-    puts results
+      # Здесь вы можете использовать значения из каждой строки row
+      osnovnoi_meneger = row["OsnovnoiMeneger"]
+      email = row["Email"]
+      tip_kontragenta_ilsh = row["TipKontragentaILSh"]
+      tip_kontragenta_cmk = row["TipKontragentaCMK"]
+      tip_kontragenta_shop = row["TipKontragentaSHOP"]
+      podrazdelenie = row["Podrazdelenie"]
 
-    # Преобразовать результаты в строку для отображения с помощью render plain
-    result_string = results.map { |result| "#{result.OsnovnoiMeneger},#{result.Email}, #{result.TipKontragentaILSh}, #{result.TipKontragentaCMK}, #{result.TipKontragentaSHOP}" }.join("\n")
+      unless params == row["params"]
+        # удалить старый прайс
+        # создать новый
+        params = row["params"]
+        kol += 1
+      end
+      # Ваш код обработки для каждой строки
+      # Например, вы можете использовать эти значения для отправки писем или других действий
+      puts "OsnovnoiMeneger: #{osnovnoi_meneger}, Email: #{email}, TipKontragentaILSh: #{tip_kontragenta_ilsh}, TipKontragentaCMK: #{tip_kontragenta_cmk}, TipKontragentaSHOP: #{tip_kontragenta_shop}, Podrazdelenie: #{podrazdelenie}"
+      i +=1
+    end
 
-    # Отрендерить результаты в виде простого текста
-    render plain: result_string
+    render plain: "Сделано #{kol} разa для  #{i} записей"
+
   end
 
 end
