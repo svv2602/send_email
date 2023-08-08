@@ -71,7 +71,7 @@ class ApiController < ApplicationController
     xls_file.write xls_data
 
     # Сохраняем файл на сервере
-    @file_path = "#{Rails.root}/tmp/leftovers_with_properties.xls"
+    @file_path = "#{Rails.root}/tmp/prices/leftovers_with_properties.xls"
     File.open(@file_path, 'wb') { |f| f.write(xls_data.string) }
     puts "Создан новый прайс  #{@file_path} \n #{Time.now}"
 
@@ -107,7 +107,7 @@ class ApiController < ApplicationController
   end
 
   def grup_partner
-    # Email.delete_all
+    Email.delete_all
     results = list_partners_to_send_email
     kol = 0
     i = 0
@@ -128,6 +128,7 @@ class ApiController < ApplicationController
         params = row["params"]
         kol += 1
       end
+      export_to_xls if kol < 2
       # Ваш код обработки для каждой строки
       # Например, вы можете использовать эти значения для отправки писем или других действий
       puts "OsnovnoiMeneger: #{osnovnoi_meneger}, Email: #{email}, TipKontragentaILSh: #{tip_kontragenta_ilsh}, TipKontragentaCMK: #{tip_kontragenta_cmk}, TipKontragentaSHOP: #{tip_kontragenta_shop}, Podrazdelenie: #{podrazdelenie}"
@@ -142,18 +143,49 @@ class ApiController < ApplicationController
   def report_email
     # Получить все успешно доставленные письма за последние 7 дней
     # deliveries = Email.where('created_at > ?', Time.now - 7.days)
-    deliveries = Email.where("DATE(emails.created_at) = DATE('now')")
+    if params[:send].to_i == 0
+      params_send = true
+      str_head = "Список адресов, ожидающих отправки:\n\n"
+    else
+      params_send = false
+      str_head = "Список рассылок email за сегодня:\n\n"
+    end
+
+    if params_send
+      sql_query = <<-SQL
+SELECT partners.*
+FROM "partners"
+         LEFT JOIN (
+    SELECT emails.*
+    FROM "emails"
+    WHERE DATE("emails"."created_at") = DATE('now')
+) as "emails_date" ON "emails_date"."to" = "partners"."Email"
+WHERE "emails_date"."to" IS NULL AND "partners"."Email" != ""
+ORDER BY Email;
+      SQL
+      deliveries = ActiveRecord::Base.connection.execute(sql_query)
+    else
+      deliveries = Email.where("DATE(emails.created_at) = DATE('now')")
+
+    end
 
     @msg_data_load = ""
     # Вывести email-адреса получателей
     deliveries.each_with_index do |delivery, i|
-      ind = i < 10 ** 10 ? 11 - (i + 1).to_s.length.to_i : 1
-      @msg_data_load_select = "#{i + 1}: #{delivery.created_at } #{" " * ind} #{delivery.to }; #{delivery.body }\n"
+      ind = i < 5 ** 10 ? 5 - (i + 1).to_s.length.to_i : 1
+
+      if params_send
+        str = "#{" " * ind} #{delivery["Email"]};   #{delivery["Kontragent"]}"
+      else
+        str = "#{" " * ind} #{delivery.created_at }    #{delivery.to}; #{delivery.body}"
+      end
+
+      @msg_data_load_select = "#{i + 1}:  #{str}\n"
       @msg_data_load += @msg_data_load_select
       puts @msg_data_load_select
     end
 
-    render plain: "Список рассылок email за сегодня:\n\n" + @msg_data_load + "\nОтчет создан: #{Time.now}"
+    render plain: str_head + @msg_data_load + "\nОтчет создан: #{Time.now}"
   end
 
 end

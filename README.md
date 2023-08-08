@@ -19,7 +19,11 @@
 * `default from:` - аттрибуты по умолчанию
 * `unsubscribe_url` - адрес для отписки от рассылки в методе `send_email_with_attachment`
 
-
+### Получение списка клиентов для рассылки
+*  в app/controllers/concerns/data_access_methods.rb запрос в методе list_partners_to_send_email 
+(отбираются только те клиенты, которым за сегодня еще не отправлялись прайсы)
+* просмотреть список отправленных можно по адресу `/report?send=1` или `/report`
+* просмотреть список адресов к отправке `/report?send=0`
 
 
 * ...
