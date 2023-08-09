@@ -27,21 +27,8 @@ module DataAccessMethods
     end
 
     def list_partners_to_send_email
-      #   sql_query = <<-SQL
-      # SELECT partners.*,
-      #        TipKontragentaILSh || ',' || TipKontragentaCMK || ',' || TipKontragentaSHOP || ',' || Podrazdelenie as params
-      # FROM "partners"
-      # LEFT JOIN (
-      #   SELECT emails.*
-      #   FROM "emails"
-      #   WHERE DATE("emails"."created_at") = DATE('now')
-      # ) as "emails_date" ON "emails_date"."to" = "partners"."Email"
-      # WHERE "emails_date"."to" IS NULL AND "partners"."Email" != ""
-      # ORDER BY params;
-      #   SQL
-
       # В запросе дублируемые email объединяются в один 
-      # типы пра
+      # типы прайсов дублируемых email объеденяются в один соответствующий массив
       sql_query = <<-SQL
 SELECT partners_select.*,
        TipKontragentaILSh || ',' || TipKontragentaCMK || ',' || TipKontragentaSHOP || ',' || Podrazdelenie as params
@@ -85,12 +72,42 @@ ORDER BY params;
       SQL
 
       results = ActiveRecord::Base.connection.execute(sql_query)
-
     end
 
-    # def list_partners_to_send_email?
-    #   list_partners_to_send_email.any?
-    # end
+
+    def request_report(params_send)
+      if params_send
+        sql_query = <<-SQL
+SELECT partners.*
+FROM "partners"
+         LEFT JOIN (
+    SELECT emails.*
+    FROM "emails"
+    WHERE DATE("emails"."created_at") = DATE('now')
+) as "emails_date" ON "emails_date"."to" = "partners"."Email"
+WHERE "emails_date"."to" IS NULL AND "partners"."Email" != ""
+ORDER BY Email;
+        SQL
+        deliveries = ActiveRecord::Base.connection.execute(sql_query)
+      else
+        deliveries = Email.where("DATE(emails.created_at) = DATE('now')")
+      end
+
+      @msg_data_load = ""
+      # Вывести email-адреса получателей
+      deliveries.each_with_index do |delivery, i|
+        ind = i < 5 ** 10 ? 5 - (i + 1).to_s.length.to_i : 1
+        if params_send
+          str = "#{" " * ind} #{delivery["Email"]};   #{delivery["Kontragent"]}"
+        else
+          str = "#{" " * ind} #{delivery.created_at }    #{delivery.to}; #{delivery.body}"
+        end
+        @msg_data_load_select = "#{i + 1}:  #{str}\n"
+        @msg_data_load += @msg_data_load_select
+        # puts @msg_data_load_select
+      end
+    end
 
   end
+
 end

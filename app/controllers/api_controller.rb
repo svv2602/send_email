@@ -5,6 +5,8 @@ class ApiController < ApplicationController
   include DataAccessMethods
   include InputDataMethods
   include ResponseAggregatorMethods
+  include CreateFileXlsMethods
+
   after_action :delete_old_emails, only: :import_data_from_api
 
   def import_data_from_api
@@ -23,65 +25,11 @@ class ApiController < ApplicationController
 
   end
 
-  def export_to_xls
-    set_sheet_params
-
-    # Получить хеш с для построения запроса
-    hash_with_params_sklad = hash_query_params_all(@skl, @grup, @podrazdel, @price, @product, @max_count, @sheet_select)
-
-    results = build_leftovers_combined_query(hash_with_params_sklad)
-
-    grouped_results = results.group(:artikul, :Tovar_Kategoriya)
-                             .select(hash_grouped_name_collumns(hash_with_params_sklad)[:attr_query])
-
-    # Создание объекта для XLS-файла
-    xls_file = Spreadsheet::Workbook.new
-    xls_sheet = xls_file.create_worksheet(name: @sheet_name)
-
-    # Создание стиля для зеленого фона
-    green_background = Spreadsheet::Format.new(color: :white, pattern: 1,
-                                               pattern_fg_color: :green,
-                                               border: :thin)
-    # Создание стиля с границей
-    border_style = Spreadsheet::Format.new(border: :thin, color: :black)
-
-    # Добавление заголовков в таблицу XLS
-    column_names = hash_grouped_name_collumns(hash_with_params_sklad)[:attr_query_name_collumn]
-    xls_sheet.row(0).concat column_names
-
-    # Применение стиля к каждой ячейке заголовков, если она содержит значение
-    column_names.each_with_index do |value, col_index|
-      if value.present?
-        xls_sheet.row(0).set_format(col_index, green_background)
-      end
-    end
-
-    # Заполнение таблицы данными
-    grouped_results.each_with_index do |leftover, index|
-      row_values = column_names.map { |column| leftover.send(column) }
-      xls_sheet.row(index + 1).push(*row_values)
-
-      # Применение стиля с границей к каждой ячейке в строках с данными
-      row_values.each_with_index do |cell_value, col_index|
-        xls_sheet.row(index + 1).set_format(col_index, border_style)
-      end
-    end
-
-    xls_data = StringIO.new
-    xls_file.write xls_data
-
-    # Сохраняем файл на сервере
-    @file_path = "#{Rails.root}/tmp/prices/leftovers_with_properties.xls"
-    File.open(@file_path, 'wb') { |f| f.write(xls_data.string) }
-    puts "Создан новый прайс  #{@file_path} \n #{Time.now}"
-
-  end
-
   # def grouped_vidceny
   #   Price.group(:Vidceny).order(:Vidceny).pluck(:Vidceny)
   # end
 
-  def generate_and_send_email
+  def send_email
     export_to_xls
     file_path = @file_path
 
@@ -140,7 +88,8 @@ class ApiController < ApplicationController
 
   end
 
-  def report_email
+
+  def report
     # Получить все успешно доставленные письма за последние 7 дней
     # deliveries = Email.where('created_at > ?', Time.now - 7.days)
     if params[:send].to_i == 0
@@ -150,40 +99,7 @@ class ApiController < ApplicationController
       params_send = false
       str_head = "Список рассылок email за сегодня:\n\n"
     end
-
-    if params_send
-      sql_query = <<-SQL
-SELECT partners.*
-FROM "partners"
-         LEFT JOIN (
-    SELECT emails.*
-    FROM "emails"
-    WHERE DATE("emails"."created_at") = DATE('now')
-) as "emails_date" ON "emails_date"."to" = "partners"."Email"
-WHERE "emails_date"."to" IS NULL AND "partners"."Email" != ""
-ORDER BY Email;
-      SQL
-      deliveries = ActiveRecord::Base.connection.execute(sql_query)
-    else
-      deliveries = Email.where("DATE(emails.created_at) = DATE('now')")
-
-    end
-
-    @msg_data_load = ""
-    # Вывести email-адреса получателей
-    deliveries.each_with_index do |delivery, i|
-      ind = i < 5 ** 10 ? 5 - (i + 1).to_s.length.to_i : 1
-
-      if params_send
-        str = "#{" " * ind} #{delivery["Email"]};   #{delivery["Kontragent"]}"
-      else
-        str = "#{" " * ind} #{delivery.created_at }    #{delivery.to}; #{delivery.body}"
-      end
-
-      @msg_data_load_select = "#{i + 1}:  #{str}\n"
-      @msg_data_load += @msg_data_load_select
-      puts @msg_data_load_select
-    end
+    request_report(params_send)
 
     render plain: str_head + @msg_data_load + "\nОтчет создан: #{Time.now}"
   end
