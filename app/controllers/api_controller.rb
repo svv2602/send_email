@@ -11,8 +11,14 @@ class ApiController < ApplicationController
 
   def import_data_from_api
     @msg_data_load = ""
-    import_data_load
-    render plain: @msg_data_load + "\n #{Time.now}"
+    unless DataWriteStatus.in_progress?
+      DataWriteStatus.set_in_progress(true)
+      import_data_load
+      DataWriteStatus.set_in_progress(false)
+    else
+      @msg_data_load = "Процесс уже запущен"
+    end
+    render plain: @msg_data_load + "\n\n#{Time.now}"
   end
 
   def create_xls
