@@ -33,6 +33,7 @@ module InputDataMethods
       end
 
       puts @msg_data_load_select
+      @msg_data_load ||= ""
       @msg_data_load += @msg_data_load_select
     end
 
@@ -68,6 +69,7 @@ module InputDataMethods
     end
 
     def set_settings_price_from_api
+      @msg_data_load_select = ""
       url = 'http://192.168.3.14/erp_main/hs/price/settings/'
       response = HTTParty.get(url)
       if response.code == 200
@@ -79,6 +81,8 @@ module InputDataMethods
         @msg_data_load_select = "Не удалось получить данные из API."
       end
       puts @msg_data_load_select
+
+      @msg_data_load ||= ""
       @msg_data_load += @msg_data_load_select
     end
 

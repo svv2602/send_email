@@ -70,6 +70,14 @@ module CreateFileXlsMethods
 
     end
 
+    def hash_value_keys_partner(tk_ilsh, tk_cmk, tk_shop, skl_pdrzd)
+      { TipKontragentaILSh: tk_ilsh,
+        TipKontragentaCMK: tk_cmk,
+        TipKontragentaSHOP: tk_shop,
+        Podrazdelenie: skl_pdrzd
+      }
+    end
+
     def set_price_sheet_attributes
       tabPartner = db_columns[:Partner]
 
@@ -102,9 +110,10 @@ module CreateFileXlsMethods
           max_count = 0
 
           # ====================================================
-          # Название листа в файле
+          # Название листа в файле и максимальное количество
           # ====================================================
           sheet_name = value[:name] || key.to_s
+          max_count = value[:items].to_i
 
           # ====================================================
           # Массив свойств номенлатуры
@@ -276,7 +285,8 @@ module CreateFileXlsMethods
               ]
             }
           },
-          "name": "Легковые шины"
+          "name": "Легковые шины",
+          "items": "12"
         },
         "list2": {
           "settings": {
@@ -312,7 +322,8 @@ module CreateFileXlsMethods
               ]
             }
           },
-          "name": "Диски"
+          "name": "Диски",
+          "items": "4"
         },
         "list3": {
           "settings": {
@@ -320,7 +331,8 @@ module CreateFileXlsMethods
               "Размер",
               "Тип каркаса",
               "Тип шины",
-              "Производитель"
+              "Производитель",
+              "СезоннаяГруппа"
             ],
             "ВидНоменклатуры": [
               "грузовые",
@@ -335,6 +347,10 @@ module CreateFileXlsMethods
               {
                 "Склад": "РОЗНИЦА",
                 "ЭтоГруппа": "Да"
+              },
+              {
+                "Склад": "",
+                "ЭтоГруппа": ""
               }
             ],
             "ТипыЦен": {
@@ -350,7 +366,8 @@ module CreateFileXlsMethods
               ]
             }
           },
-          "name": "Грузовые шины"
+          "name": "Грузовые шины",
+          "items": "4"
         },
         "list4": {
           "settings": {
@@ -373,19 +390,10 @@ module CreateFileXlsMethods
                 "ЭтоГруппа": "Да"
               }
             ],
-            "ТипыЦен": {
-              "settings": [
-                {
-                  "default": [
-                    "Опт",
-                    "Мин",
-                    "Розница"
-                  ]
-                }
-              ]
-            }
+            "ТипыЦен": ""
           },
-          "name": "Грузовые диски"
+          "name": "Грузовые диски",
+          "items": "4"
         },
         "list5": {
           "settings": {
@@ -410,11 +418,13 @@ module CreateFileXlsMethods
             ],
             "ТипыЦен": ""
           },
-          "name": "СХ"
+          "name": "СХ",
+          "items": "6"
         }
       }
-    end
 
-    #====================================================================
+      #====================================================================
+    end
   end
+
 end

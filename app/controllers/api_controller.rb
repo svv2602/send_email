@@ -1,7 +1,7 @@
 require 'httparty'
 require 'spreadsheet'
 
-  class ApiController < ApplicationController
+class ApiController < ApplicationController
   include DataAccessMethods
   include InputDataMethods
   include ResponseAggregatorMethods
@@ -60,8 +60,6 @@ require 'spreadsheet'
     puts "Удалены все записи из Email, старше #{days_ago} дней."
   end
 
-
-
   def grup_partner
     set_settings_price_from_api
 
@@ -75,29 +73,34 @@ require 'spreadsheet'
     results.each do |row|
       osnovnoi_meneger = row["OsnovnoiMeneger"]
       email = row["Email"]
-      tip_kontragenta_ilsh = row["TipKontragentaILSh"]
-      tip_kontragenta_cmk = row["TipKontragentaCMK"]
-      tip_kontragenta_shop = row["TipKontragentaSHOP"]
-      podrazdelenie = row["Podrazdelenie"]
 
       unless params == row["params"]
         # удалить старый прайс
         # создать новый
+        tip_kontragenta_ilsh = row["TipKontragentaILSh"]
+        tip_kontragenta_cmk = row["TipKontragentaCMK"]
+        tip_kontragenta_shop = row["TipKontragentaSHOP"]
+        podrazdelenie = row["Podrazdelenie"]
+        hash_value = hash_value_keys_partner(row["TipKontragentaILSh"],
+                                             row["TipKontragentaCMK"],
+                                             row["TipKontragentaSHOP"],
+                                             row["Podrazdelenie"])
+
         params = row["params"]
         kol += 1
       end
       export_to_xls if kol < 2
       # Ваш код обработки для каждой строки
       # Например, вы можете использовать эти значения для отправки писем или других действий
-      puts "OsnovnoiMeneger: #{osnovnoi_meneger}, Email: #{email}, TipKontragentaILSh: #{tip_kontragenta_ilsh}, TipKontragentaCMK: #{tip_kontragenta_cmk}, TipKontragentaSHOP: #{tip_kontragenta_shop}, Podrazdelenie: #{podrazdelenie}"
-      Email.create(to: email, subject: "прайс№ #{kol}", body: "OsnovnoiMeneger: #{osnovnoi_meneger}, Podrazdelenie: #{podrazdelenie}", delivered: true)
+      puts "email: #{email}   hash_value: #{hash_value}"
+      # puts "OsnovnoiMeneger: #{osnovnoi_meneger}, Email: #{email}, TipKontragentaILSh: #{tip_kontragenta_ilsh}, TipKontragentaCMK: #{tip_kontragenta_cmk}, TipKontragentaSHOP: #{tip_kontragenta_shop}, Podrazdelenie: #{podrazdelenie}"
+      # Email.create(to: email, subject: "прайс№ #{kol}", body: "OsnovnoiMeneger: #{osnovnoi_meneger}, Podrazdelenie: #{podrazdelenie}", delivered: true)
       i += 1
     end
 
     render plain: "Сделано #{kol} разa для  #{i} записей"
 
   end
-
 
   def report
     # Получить все успешно доставленные письма за последние 7 дней
