@@ -63,7 +63,23 @@ module InputDataMethods
           end
         end
       end
+      set_settings_price_from_api # получить настройки прайсов и записать в json-файл
 
+    end
+
+    def set_settings_price_from_api
+      url = 'http://192.168.3.14/erp_main/hs/price/settings/'
+      response = HTTParty.get(url)
+      if response.code == 200
+        @file_path = "#{Rails.root}/tmp/prices/price_settings.json"
+        File.open(@file_path, 'wb') { |f| f.write(response.body) }
+
+        @msg_data_load_select = "Получены настройки прайс листа! \n"
+      else
+        @msg_data_load_select = "Не удалось получить данные из API."
+      end
+      puts @msg_data_load_select
+      @msg_data_load += @msg_data_load_select
     end
 
     def db_columns
@@ -125,5 +141,7 @@ module InputDataMethods
       }
 
     end
+
+
   end
 end

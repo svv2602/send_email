@@ -1,7 +1,7 @@
 require 'httparty'
 require 'spreadsheet'
 
-class ApiController < ApplicationController
+  class ApiController < ApplicationController
   include DataAccessMethods
   include InputDataMethods
   include ResponseAggregatorMethods
@@ -60,7 +60,11 @@ class ApiController < ApplicationController
     puts "Удалены все записи из Email, старше #{days_ago} дней."
   end
 
+
+
   def grup_partner
+    set_settings_price_from_api
+
     Email.delete_all
     results = list_partners_to_send_email
     kol = 0
@@ -108,6 +112,10 @@ class ApiController < ApplicationController
     request_report(params_send)
 
     render plain: str_head + @msg_data_load + "\nОтчет создан: #{Time.now}"
+  end
+
+  def attr_price
+    set_settings_price_from_api
   end
 
 end

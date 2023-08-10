@@ -68,12 +68,317 @@ module CreateFileXlsMethods
       #        добавить доп цены для каждого типа контрагента (может быть стоит разобрать, получаем как массив)
       #       добавить склад для Podrazdelenie
 
+    end
 
+    def set_price_sheet_attributes
+      tabPartner = db_columns[:Partner]
+
+      hash_value_keys_partner = { TipKontragentaILSh: "B2B",
+                                  TipKontragentaCMK: "B2C более 50 т.с",
+                                  TipKontragentaSHOP: "Автоимпортер",
+                                  Podrazdelenie: "ТСЦ-04 К (Киев, Оболонь)"
+      }
+
+      file_path = "#{Rails.root}/tmp/prices/price_settings.json"
+      json_string = File.read(file_path)
+
+      hash_settings = JSON.parse(json_string) # test_setting
+      #===========================================================
+      hash_settings = test_setting
+      # временные переменные, заменить на получаемые по API
+      # ===========================================================
+
+      sheet_name = ""
+      skl = []
+      grup = []
+      podrazdel = []
+      price = []
+      product = []
+      sheet_select_product = {}
+      @max_count = 0
+      @sheet_select = {}
+      if hash_settings
+
+        hash_settings.each do |key, value|
+          sheet_name = value[:name]
+
+          product = value[:settings].is_a?(Hash) && value[:settings][:Свойства] ? value[:settings][:Свойства] : []
+
+          # Определение фильтров по видам номенклатуры и категоий товара
+          ktg = value[:settings].is_a?(Hash) && value[:settings][:ТоварнаяКатегория] ? value[:settings][:ТоварнаяКатегория] : []
+          vid = value[:settings].is_a?(Hash) && value[:settings][:ВидНоменклатуры] ? value[:settings][:ВидНоменклатуры] : []
+
+          sheet_select_product = {
+            TovarnayaKategoriya: ktg,
+            VidNomenklatury: vid
+          }
+
+          # Определение типов цен для контрагента по листам
+          result = value[:settings][:ТипыЦен][:maintype].downcase
+          result2 = tabPartner.find { |key, value| value.downcase == result }
+          value[:settings][:ТипыЦен][:settings].each do |el|
+            el.each do |key, value|
+              price << el[:default] if key == :default
+              price << el[:prices] if el[:type] == result2
+            end
+          end
+          price = price.flatten.uniq
+
+          podrazdel << hash_value_keys_partner[:Podrazdelenie]
+
+          value[:settings][:Склады].each do |el|
+            el[:ЭтоГруппа] == "Да" ? grup << el[:Склад] : skl << el[:Склад]
+          end
+
+          list = { sheet_name: sheet_name,
+                   product: product,
+                   price: price,
+                   podrazdel: podrazdel,
+                   sheet_select_product: sheet_select_product,
+                   grup: grup,
+                   skl: skl
+          }
+          puts list
+        end
+      else
+        puts "Нет настроек для прайс-листа"
+      end
 
     end
 
+    def test_setting
+      {
+        "list1": {
+          "settings": {
+            "Свойства": [
+              "Индекс нагрузки",
+              "Индекс скорости",
+              "Индекс слойности",
+              "Модель",
+              "Размер",
+              "Производитель",
+              "СезоннаяГруппа"
+            ],
+            "ВидНоменклатуры": [
+              "легковые"
+            ],
+            "Склады": [
+              {
+                "Склад": "ОСПП и ТСС",
+                "ЭтоГруппа": "Да"
+              },
+              {
+                "Склад": "РОЗНИЦА",
+                "ЭтоГруппа": "Да"
+              }
+            ],
+            "ТипыЦен": {
+              "maintype": "ТипконтрагентаИЛШ",
+              "settings": [
+                {
+                  "default": [
+                    "Интернет",
+                    "База"
+                  ]
+                },
+                {
+                  "type": "B2B",
+                  "prices": [
+                    "Опт"
+                  ]
+                },
+                {
+                  "type": "B2C более 50 т.с",
+                  "prices": [
+                    "Спец А"
+                  ]
+                },
+                {
+                  "type": "B2C до 50 т.с.",
+                  "prices": [
+                    "Спец Б"
+                  ]
+                },
+                {
+                  "type": "Автоимпортер",
+                  "prices": [
+                    "Спец С"
+                  ]
+                },
+                {
+                  "type": "Автосалон",
+                  "prices": [
+                    "Спец С"
+                  ]
+                },
+                {
+                  "type": "Автосборочное предприятие",
+                  "prices": [
+                    "Спец Б"
+                  ]
+                },
+                {
+                  "type": "Агрохолдинг",
+                  "prices": [
+                    "Спец С"
+                  ]
+                },
+                {
+                  "type": "Гос.организация",
+                  "prices": [
+                    "Тендер"
+                  ]
+                },
+                {
+                  "type": "Интернет платформа",
+                  "prices": [
+                    "Маг3"
+                  ]
+                },
+                {
+                  "type": "Интернет-магазин",
+                  "prices": [
+                    "Интернет"
+                  ]
+                },
+                {
+                  "type": "УкрОборонПром",
+                  "prices": [
+                    "Спец С"
+                  ]
+                }
+              ]
+            }
+          },
+          "name": "Легковые шины"
+        },
+        "list2": {
+          "settings": {
+            "Свойства": [
+              "DIA диска",
+              "PCD диска",
+              "Вылет диска ET",
+              "Ширина диска",
+              "Производитель"
+            ],
+            "ВидНоменклатуры": [
+              "диски"
+            ],
+            "Склады": [
+              {
+                "Склад": "ОСПП и ТСС",
+                "ЭтоГруппа": "Да"
+              },
+              {
+                "Склад": "РОЗНИЦА",
+                "ЭтоГруппа": "Да"
+              }
+            ],
+            "ТипыЦен": {
+              "maintype": "ТипконтрагентаИЛШ",
+              "settings": [
+                {
+                  "default": [
+                    "База",
+                    "Розница"
+                  ]
+                }
+              ]
+            }
+          },
+          "name": "Диски"
+        },
+        "list3": {
+          "settings": {
+            "Свойства": [
+              "Размер",
+              "Тип каркаса",
+              "Тип шины",
+              "Производитель"
+            ],
+            "ВидНоменклатуры": [
+              "грузовые",
+              "грузовые импортные",
+              "грузовые отечественные"
+            ],
+            "Склады": [
+              {
+                "Склад": "ОСПП и ТСС",
+                "ЭтоГруппа": "Да"
+              },
+              {
+                "Склад": "РОЗНИЦА",
+                "ЭтоГруппа": "Да"
+              }
+            ],
+            "ТипыЦен": {
+              "maintype": "ТипконтрагентаЦМК",
+              "settings": [
+                {
+                  "default": [
+                    "Опт",
+                    "Мин",
+                    "Розница"
+                  ]
+                }
+              ]
+            }
+          },
+          "name": "Грузовые шины"
+        },
+        "list4": {
+          "settings": {
+            "Свойства": [
+              "Размер",
+              "Тип каркаса",
+              "Тип шины",
+              "Производитель"
+            ],
+            "ВидНоменклатуры": [
+              "грузовые диски"
+            ],
+            "Склады": [
+              {
+                "Склад": "ОСПП и ТСС",
+                "ЭтоГруппа": "Да"
+              },
+              {
+                "Склад": "РОЗНИЦА",
+                "ЭтоГруппа": "Да"
+              }
+            ],
+            "ТипыЦен": ""
+          },
+          "name": "Грузовые диски"
+        },
+        "list5": {
+          "settings": {
+            "Свойства": [
+              "Размер",
+              "Тип каркаса",
+              "Тип шины",
+              "Производитель"
+            ],
+            "ВидНоменклатуры": [
+              "с/х"
+            ],
+            "Склады": [
+              {
+                "Склад": "ОСПП и ТСС",
+                "ЭтоГруппа": "Да"
+              },
+              {
+                "Склад": "РОЗНИЦА",
+                "ЭтоГруппа": "Да"
+              }
+            ],
+            "ТипыЦен": ""
+          },
+          "name": "СХ"
+        }
+      }
+    end
 
-
-#====================================================================
+    #====================================================================
   end
 end

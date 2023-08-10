@@ -3,6 +3,7 @@ module ResponseAggregatorMethods
 
   included do
     def set_sheet_params
+      # hash_settings = test_setting
       # временные переменные, заменить на получаемые по API
       @sheet_name = "Легковая шина"
       @skl = ['Винница ОСПП оптовый склад', 'Главный склад Днепр  оптовый склад'].uniq
@@ -12,10 +13,12 @@ module ResponseAggregatorMethods
       @product = ["id", "Artikul", "Nomenklatura", "Ves", "Artikul", "Nomenklatura", "Ves", "Proizvoditel", "VidNomenklatury", "TipTovara", "TovarnayaKategoriya"].uniq
       @max_count = 20
       @sheet_select = {
-        TovarnayaKategoriya: ['Сельхоз отечественный', 'шины грузовые комбинированные', 'Bridgestone'],
+        TovarnayaKategoriya: [],
         VidNomenklatury: ['грузовые', 'легковые', 'регулируемое давление']
       }
     end
+
+
 
     def hash_query_params_all(skl, grup, podrazdel, price, product, max_count, sheet_select)
       array_query1_where = []
@@ -58,7 +61,7 @@ module ResponseAggregatorMethods
         end
       end
 
-      # Обработка таблицы товаров
+      # Обработка таблицы товаров (cвойства номенклатуры в столбцы)
       if product.is_a?(Array) && !product.empty?
         product.each do |element|
           array_query1_select << "products.#{element}"
@@ -78,10 +81,12 @@ module ResponseAggregatorMethods
         if value.is_a?(Array) && !value.empty?
           arr = []
           value.each do |element|
-            arr << "products.#{key.to_s} = '#{element}' "
+            arr << "products.#{key.to_s} = '#{element}' " #if key == :VidNomenklatury #
           end
-          str_array_query1_where += " AND (#{arr.join(' OR ')})"
-          str_array_query2_where += " AND (#{arr.join(' OR ')})"
+          unless arr.empty?
+            str_array_query1_where += " AND (#{arr.join(' OR ')})"
+            str_array_query2_where += " AND (#{arr.join(' OR ')})"
+          end
         end
       end
 
@@ -135,6 +140,7 @@ module ResponseAggregatorMethods
       attr_query
       hash_grouped = { attr_query_name_collumn: attr_query_name_collumn, attr_query: attr_query }
     end
+
 
   end
 
