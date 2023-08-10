@@ -88,23 +88,32 @@ module CreateFileXlsMethods
       # временные переменные, заменить на получаемые по API
       # ===========================================================
 
-      sheet_name = ""
-      skl = []
-      grup = []
-      podrazdel = []
-      price = []
-      product = []
-      sheet_select_product = {}
-      @max_count = 0
-      @sheet_select = {}
+      list = {}
       if hash_settings
 
         hash_settings.each do |key, value|
-          sheet_name = value[:name]
+          sheet_name = ""
+          skl = []
+          grup = []
+          podrazdel = []
+          price = []
+          product = []
+          sheet_select_product = {}
+          max_count = 0
 
+          # ====================================================
+          # Название листа в файле
+          # ====================================================
+          sheet_name = value[:name] || key.to_s
+
+          # ====================================================
+          # Массив свойств номенлатуры
+          # ====================================================
           product = value[:settings].is_a?(Hash) && value[:settings][:Свойства] ? value[:settings][:Свойства] : []
 
+          # ====================================================
           # Определение фильтров по видам номенклатуры и категоий товара
+          # ====================================================
           ktg = value[:settings].is_a?(Hash) && value[:settings][:ТоварнаяКатегория] ? value[:settings][:ТоварнаяКатегория] : []
           vid = value[:settings].is_a?(Hash) && value[:settings][:ВидНоменклатуры] ? value[:settings][:ВидНоменклатуры] : []
 
@@ -113,37 +122,54 @@ module CreateFileXlsMethods
             VidNomenklatury: vid
           }
 
+          # ====================================================
           # Определение типов цен для контрагента по листам
-          result = value[:settings][:ТипыЦен][:maintype].downcase
-          result2 = tabPartner.find { |key, value| value.downcase == result }
-          value[:settings][:ТипыЦен][:settings].each do |el|
-            el.each do |key, value|
-              price << el[:default] if key == :default
-              price << el[:prices] if el[:type] == result2
-            end
-          end
-          price = price.flatten.uniq
+          # ====================================================
 
+          if value[:settings][:ТипыЦен].is_a?(Hash) && value[:settings][:ТипыЦен]
+            if value[:settings][:ТипыЦен][:maintype]
+              result = value[:settings][:ТипыЦен][:maintype].downcase
+              result2 = tabPartner.find { |key, value| value.downcase == result }
+            else
+              result2 = ""
+            end
+
+            value[:settings][:ТипыЦен][:settings].each do |el|
+              el.each do |key, value|
+                price << el[:default] if key == :default
+                price << el[:prices] if el[:type] == result2
+              end
+            end
+            price = price.flatten.uniq
+          else
+            price = []
+          end
+
+          # ====================================================
+          # Определение дополнительного склада для подразделения
+          # ====================================================
           podrazdel << hash_value_keys_partner[:Podrazdelenie]
 
           value[:settings][:Склады].each do |el|
             el[:ЭтоГруппа] == "Да" ? grup << el[:Склад] : skl << el[:Склад]
           end
 
-          list = { sheet_name: sheet_name,
-                   product: product,
-                   price: price,
-                   podrazdel: podrazdel,
-                   sheet_select_product: sheet_select_product,
-                   grup: grup,
-                   skl: skl
+          list[key] = { sheet_name: sheet_name,
+                        product: product,
+                        price: price,
+                        podrazdel: podrazdel,
+                        sheet_select_product: sheet_select_product,
+                        grup: grup,
+                        skl: skl,
+                        max_count: max_count
           }
-          puts list
+          # puts list
         end
       else
         puts "Нет настроек для прайс-листа"
       end
 
+      list
     end
 
     def test_setting
@@ -347,7 +373,17 @@ module CreateFileXlsMethods
                 "ЭтоГруппа": "Да"
               }
             ],
-            "ТипыЦен": ""
+            "ТипыЦен": {
+              "settings": [
+                {
+                  "default": [
+                    "Опт",
+                    "Мин",
+                    "Розница"
+                  ]
+                }
+              ]
+            }
           },
           "name": "Грузовые диски"
         },
