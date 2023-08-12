@@ -61,10 +61,17 @@ class ApiController < ApplicationController
   end
 
   def grup_partner
-    set_settings_price_from_api
 
-    Email.delete_all
-    results = list_partners_to_send_email
+    Email.delete_all # удалить в рабочей
+
+    directory_path = "#{Rails.root}/tmp/prices/"
+    FileUtils.mkdir_p(directory_path) unless Dir.exist?(directory_path)
+
+    name_price = "price"
+    @price_path = "#{directory_path}#{name_price}.xls"
+
+
+    results = list_partners_to_send_email # получить список клиентов не получивших почту сегодня
     kol = 0
     i = 0
     params = nil
@@ -76,23 +83,33 @@ class ApiController < ApplicationController
 
       unless params == row["params"]
         # удалить старый прайс
-        # создать новый
-        tip_kontragenta_ilsh = row["TipKontragentaILSh"]
-        tip_kontragenta_cmk = row["TipKontragentaCMK"]
-        tip_kontragenta_shop = row["TipKontragentaSHOP"]
-        podrazdelenie = row["Podrazdelenie"]
-        hash_value = hash_value_keys_partner(row["TipKontragentaILSh"],
-                                             row["TipKontragentaCMK"],
-                                             row["TipKontragentaSHOP"],
-                                             row["Podrazdelenie"])
+        # File.delete(@price_path) if File.exist?(@price_path)
+
+        # создать новый прайс
+        @hash_value = hash_value_keys_partner(row["TipKontragentaILSh"],
+                                              row["TipKontragentaCMK"],
+                                              row["TipKontragentaSHOP"],
+                                              row["Podrazdelenie"])
+
+        settings_price = set_price_sheet_attributes(@hash_value) #хеш настроек для создания листов прайса
+        # puts "settings_price = #{settings_price}"
+        kol += 1
+        name_price = "price#{kol}"
+        @price_path = "#{directory_path}#{name_price}.xls"
+        create_book_xls
 
         params = row["params"]
-        kol += 1
+        if kol >= 5
+          break  # Выходим из цикла, если значение равно 5
+        end
+
       end
-      export_to_xls if kol < 2
+      # export_to_xls if kol < 2
       # Ваш код обработки для каждой строки
       # Например, вы можете использовать эти значения для отправки писем или других действий
-      puts "email: #{email}   hash_value: #{hash_value}"
+      # puts "email: #{email}   hash_value: #{@hash_value}"
+      # puts settings_price
+      # puts "=" * 100
       # puts "OsnovnoiMeneger: #{osnovnoi_meneger}, Email: #{email}, TipKontragentaILSh: #{tip_kontragenta_ilsh}, TipKontragentaCMK: #{tip_kontragenta_cmk}, TipKontragentaSHOP: #{tip_kontragenta_shop}, Podrazdelenie: #{podrazdelenie}"
       # Email.create(to: email, subject: "прайс№ #{kol}", body: "OsnovnoiMeneger: #{osnovnoi_meneger}, Podrazdelenie: #{podrazdelenie}", delivered: true)
       i += 1

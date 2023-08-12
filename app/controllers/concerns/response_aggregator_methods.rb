@@ -33,7 +33,7 @@ module ResponseAggregatorMethods
       hash.each do |key, value|
         strSQL = "Leftovers.#{key.to_s}"
 
-        if value.is_a?(Array) && !value.empty?
+        if value.is_a?(Array) && !value.empty? && value != ""
           value.each do |element|
             array_name_sum << element
             array_query1_where << "#{strSQL} = '#{element}'"
@@ -64,8 +64,8 @@ module ResponseAggregatorMethods
       # Обработка таблицы товаров (cвойства номенклатуры в столбцы)
       if product.is_a?(Array) && !product.empty?
         product.each do |element|
-          array_query1_select << "products.#{element}"
-          array_query2_select << "products.#{element}"
+          array_query1_select << "products.\"#{element}\""
+          array_query2_select << "products.\"#{element}\""
           array_name << "#{element}"
         end
       end
@@ -81,7 +81,7 @@ module ResponseAggregatorMethods
         if value.is_a?(Array) && !value.empty?
           arr = []
           value.each do |element|
-            arr << "products.#{key.to_s} = '#{element}' " #if key == :VidNomenklatury #
+            arr << "products.#{key.to_s} = '#{element}' " if key == :VidNomenklatury #
           end
           unless arr.empty?
             str_array_query1_where += " AND (#{arr.join(' OR ')})"
@@ -90,9 +90,11 @@ module ResponseAggregatorMethods
         end
       end
 
+
+
       hash_result = {
-        array_query1_where: str_array_query1_where,
-        array_query2_where: str_array_query2_where,
+        array_query1_where: str_array_query1_where.gsub("() AND ", ""),
+        array_query2_where: str_array_query2_where.gsub("() AND ", ""),
         array_query1_select: str_array_query1_select,
         array_query2_select: str_array_query2_select,
         array_name: array_name,
@@ -119,7 +121,7 @@ module ResponseAggregatorMethods
                          .group("Prices.Artikul, products.TovarnayaKategoriya")
 
       @combined_results = Leftover.from("(#{leftover_query.to_sql} UNION #{price_query.to_sql}) AS leftovers_combined")
-                                  .order("leftovers_combined.TovarnayaKategoriya, leftovers_combined.artikul")
+                                  .order("leftovers_combined.Tovar_Kategoriya, leftovers_combined.artikul")
 
     end
 

@@ -73,8 +73,8 @@ module InputDataMethods
       url = 'http://192.168.3.14/erp_main/hs/price/settings/'
       response = HTTParty.get(url)
       if response.code == 200
-        @file_path = "#{Rails.root}/tmp/prices/price_settings.json"
-        File.open(@file_path, 'wb') { |f| f.write(response.body) }
+        @file_price_settings_path = "#{Rails.root}/lib/assets/price_settings.json"
+        File.open(@file_price_settings_path, 'wb') { |f| f.write(response.body) }
 
         @msg_data_load_select = "Получены настройки прайс листа! \n"
       else
