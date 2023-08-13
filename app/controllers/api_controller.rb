@@ -31,10 +31,6 @@ class ApiController < ApplicationController
 
   end
 
-  # def grouped_vidceny
-  #   Price.group(:Vidceny).order(:Vidceny).pluck(:Vidceny)
-  # end
-
   def send_email
     export_to_xls
     file_path = @file_path
@@ -44,7 +40,7 @@ class ApiController < ApplicationController
     #==============================================================
     # Отправляем письмо с вложением
     # Заблочено - раскомментировать для отправки
-    MyMailer.send_email_with_attachment(recipient_email, file_path).deliver_now
+    # MyMailer.send_email_with_attachment(recipient_email, file_path).deliver_now
 
     # Удалить временный файл
     File.delete(@file_path) if File.exist?(@file_path)
@@ -70,7 +66,6 @@ class ApiController < ApplicationController
     name_price = "price"
     @price_path = "#{directory_path}#{name_price}.xls"
 
-
     results = list_partners_to_send_email # получить список клиентов не получивших почту сегодня
     kol = 0
     i = 0
@@ -83,7 +78,7 @@ class ApiController < ApplicationController
 
       unless params == row["params"]
         # удалить старый прайс
-        # File.delete(@price_path) if File.exist?(@price_path)
+        #  File.delete(@price_path) if File.exist?(@price_path)
 
         # создать новый прайс
         @hash_value = hash_value_keys_partner(row["TipKontragentaILSh"],
@@ -91,7 +86,7 @@ class ApiController < ApplicationController
                                               row["TipKontragentaSHOP"],
                                               row["Podrazdelenie"])
 
-        settings_price = set_price_sheet_attributes(@hash_value) #хеш настроек для создания листов прайса
+        settings_price = set_price_sheet_attributes(@hash_value) # хеш настроек для создания листов прайса
         # puts "settings_price = #{settings_price}"
         kol += 1
         name_price = "price#{kol}"
@@ -99,19 +94,16 @@ class ApiController < ApplicationController
         create_book_xls
 
         params = row["params"]
+
+        # удалить в рабочей
+        # =================================================
         if kol >= 5
-          break  # Выходим из цикла, если значение равно 5
+          break # Выходим из цикла, если значение равно 5
         end
+        # =================================================
 
       end
-      # export_to_xls if kol < 2
-      # Ваш код обработки для каждой строки
-      # Например, вы можете использовать эти значения для отправки писем или других действий
-      # puts "email: #{email}   hash_value: #{@hash_value}"
-      # puts settings_price
-      # puts "=" * 100
-      # puts "OsnovnoiMeneger: #{osnovnoi_meneger}, Email: #{email}, TipKontragentaILSh: #{tip_kontragenta_ilsh}, TipKontragentaCMK: #{tip_kontragenta_cmk}, TipKontragentaSHOP: #{tip_kontragenta_shop}, Podrazdelenie: #{podrazdelenie}"
-      # Email.create(to: email, subject: "прайс№ #{kol}", body: "OsnovnoiMeneger: #{osnovnoi_meneger}, Podrazdelenie: #{podrazdelenie}", delivered: true)
+
       i += 1
     end
 
@@ -135,7 +127,8 @@ class ApiController < ApplicationController
   end
 
   def attr_price
-    set_settings_price_from_api
+    # Получить данные и создать файлы settings.json и alias.json
+    get_json_files_from_api
   end
 
 end

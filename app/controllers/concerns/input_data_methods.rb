@@ -68,25 +68,33 @@ module InputDataMethods
 
     end
 
-    def set_settings_price_from_api
-      @msg_data_load_select = ""
-      url = 'http://192.168.3.14/erp_main/hs/price/settings/'
-      response = HTTParty.get(url)
-      if response.code == 200
-        @file_price_settings_path = "#{Rails.root}/lib/assets/price_settings.json"
-        File.open(@file_price_settings_path, 'wb') { |f| f.write(response.body) }
 
-        @msg_data_load_select = "Получены настройки прайс листа! \n"
-      else
-        @msg_data_load_select = "Не удалось получить данные из API."
+    def get_json_files_from_api
+      # запись на диск данных с настройками прайса
+      attr_path = ['settings', 'alias']
+      directory_path = "#{Rails.root}/lib/assets"
+      FileUtils.mkdir_p(directory_path) unless Dir.exist?(directory_path)
+
+      attr_path.each do |el|
+        url = "http://192.168.3.14/erp_main/hs/price/#{el}/"
+        response = HTTParty.get(url)
+        if response.code == 200
+          file_path = "#{directory_path}/price_#{el}.json"
+          File.open(file_path, 'wb') { |f| f.write(response.body) }
+          @msg_data_load_select = "Получены настройки #{el}  \n"
+        else
+          @msg_data_load_select = "Не удалось получить данные #{el} из API."
+        end
+        puts @msg_data_load_select
+
       end
-      puts @msg_data_load_select
 
       @msg_data_load ||= ""
       @msg_data_load += @msg_data_load_select
     end
 
     def db_columns
+      # сопоставление названий столбцов таблиц с api
       {
         Product: {
           Artikul: "Артикул",
@@ -145,7 +153,6 @@ module InputDataMethods
       }
 
     end
-
 
   end
 end

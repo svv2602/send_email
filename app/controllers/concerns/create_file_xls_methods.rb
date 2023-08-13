@@ -8,10 +8,10 @@ module CreateFileXlsMethods
       @grup = el_hash[:grup].uniq.reject { |value| value.empty? }
       @podrazdel = el_hash[:podrazdel].uniq.reject { |value| value.empty? }
       @price = el_hash[:price].uniq.reject { |value| value.empty? }
-      @product = create_new_arr_product(el_hash[:product])
+      @product = el_hash[:product].uniq.reject { |value| value.empty? }
       @max_count = el_hash[:max_count]
       @sheet_select = el_hash[:sheet_select_product]
-      # hash[:podrazdel].reject { |value| value.empty? }
+
     end
 
     def find_key(product_el)
@@ -93,60 +93,6 @@ module CreateFileXlsMethods
 
     end
 
-    #===================================================================================
-    def export_to_xls
-      set_sheet_params
-
-      # Получить хеш с для построения запроса
-      hash_with_params_sklad = hash_query_params_all(@skl, @grup, @podrazdel, @price, @product, @max_count, @sheet_select)
-
-      results = build_leftovers_combined_query(hash_with_params_sklad)
-
-      grouped_results = results.group(:artikul, :Tovar_Kategoriya)
-                               .select(hash_grouped_name_collumns(hash_with_params_sklad)[:attr_query])
-
-      # Создание объекта для XLS-файла
-      xls_file = Spreadsheet::Workbook.new
-      xls_sheet = xls_file.create_worksheet(name: @sheet_name)
-
-      # Создание стиля для зеленого фона
-      green_background = Spreadsheet::Format.new(color: :white, pattern: 1,
-                                                 pattern_fg_color: :green,
-                                                 border: :thin)
-      # Создание стиля с границей
-      border_style = Spreadsheet::Format.new(border: :thin, color: :black)
-
-      # Добавление заголовков в таблицу XLS
-      column_names = hash_grouped_name_collumns(hash_with_params_sklad)[:attr_query_name_collumn]
-      xls_sheet.row(0).concat column_names
-
-      # Применение стиля к каждой ячейке заголовков, если она содержит значение
-      column_names.each_with_index do |value, col_index|
-        if value.present?
-          xls_sheet.row(0).set_format(col_index, green_background)
-        end
-      end
-
-      # Заполнение таблицы данными
-      grouped_results.each_with_index do |leftover, index|
-        row_values = column_names.map { |column| leftover.send(column) }
-        xls_sheet.row(index + 1).push(*row_values)
-
-        # Применение стиля с границей к каждой ячейке в строках с данными
-        row_values.each_with_index do |cell_value, col_index|
-          xls_sheet.row(index + 1).set_format(col_index, border_style)
-        end
-      end
-
-      xls_data = StringIO.new
-      xls_file.write xls_data
-
-      # Сохраняем файл на сервере
-      @file_path = "#{Rails.root}/tmp/prices/leftovers_with_properties.xls"
-      File.open(@file_path, 'wb') { |f| f.write(xls_data.string) }
-      puts "Создан новый прайс  #{@file_path} \n #{Time.now}"
-
-    end
 
     def hash_value_keys_partner(tk_ilsh, tk_cmk, tk_shop, skl_pdrzd)
       { TipKontragentaILSh: tk_ilsh,
@@ -253,6 +199,10 @@ module CreateFileXlsMethods
       list
     end
 
+
+
+
+    #=====================Удалить===========================================
     def test_setting
       {
         "list1": {
@@ -495,8 +445,10 @@ module CreateFileXlsMethods
         }
       }
 
-      #====================================================================
     end
+
+    #====================================================================
+
   end
 
 end

@@ -2,30 +2,12 @@ module ResponseAggregatorMethods
   extend ActiveSupport::Concern
 
   included do
-    def set_sheet_params
-      # hash_settings = test_setting
-      # временные переменные, заменить на получаемые по API
-      @sheet_name = "Легковая шина"
-      @skl = ['Винница ОСПП оптовый склад', 'Главный склад Днепр  оптовый склад'].uniq
-      @grup = ['ОСПП и ТСС', 'РОЗНИЦА'].uniq
-      @podrazdel = ["ТСЦ-04 К (Киев, Оболонь)"].uniq
-      @price = ["Интернет", "Мин", "Опт", "Спец С", "Интернет", "Мин", "Опт", "Спец С"].uniq
-      @product = ["id", "Artikul", "Nomenklatura", "Ves", "Artikul", "Nomenklatura", "Ves", "Proizvoditel", "VidNomenklatury", "TipTovara", "TovarnayaKategoriya"].uniq
-      @max_count = 20
-      @sheet_select = {
-        TovarnayaKategoriya: [],
-        VidNomenklatury: ['грузовые', 'легковые', 'регулируемое давление']
-      }
-    end
-
-
-
     def hash_query_params_all(skl, grup, podrazdel, price, product, max_count, sheet_select)
       array_query1_where = []
       array_query2_where = []
       array_query1_select = []
       array_query2_select = []
-      array_name = []
+      array_name_product = {}
       array_name_sum = []
 
       # обработка списка складов
@@ -63,10 +45,19 @@ module ResponseAggregatorMethods
 
       # Обработка таблицы товаров (cвойства номенклатуры в столбцы)
       if product.is_a?(Array) && !product.empty?
+        hash_product = db_columns[:Product]
         product.each do |element|
-          array_query1_select << "products.\"#{element}\""
-          array_query2_select << "products.\"#{element}\""
-          array_name << "#{element}"
+
+          str = element.gsub(" ", "")
+          hash_product.each do |key, value|
+            if value.downcase == str.downcase
+              array_query1_select << "products.#{key}"
+              array_query2_select << "products.#{key}"
+              array_name_product[key] = value
+              # array_name << element
+            end
+          end
+
         end
       end
 
@@ -97,9 +88,8 @@ module ResponseAggregatorMethods
         array_query2_where: str_array_query2_where.gsub("() AND ", ""),
         array_query1_select: str_array_query1_select,
         array_query2_select: str_array_query2_select,
-        array_name: array_name,
         array_name_sum: array_name_sum,
-        array_name_sklad: array_name + array_name_sum
+        array_name_product: array_name_product
       }
 
     end
@@ -129,9 +119,9 @@ module ResponseAggregatorMethods
       attr_query = ["artikul", "Tovar_Kategoriya"]
       attr_query_name_collumn = []
 
-      hash_with_params[:array_name].each do |el|
-        attr_query_name_collumn << "#{el}"
-        attr_query << "#{el} as `#{el}`"
+      hash_with_params[:array_name_product].each do |key, value|
+        attr_query_name_collumn << "#{key}"
+        attr_query << "#{key} as `#{key}`"
       end
 
       hash_with_params[:array_name_sum].each_with_index do |el, i|
@@ -139,8 +129,8 @@ module ResponseAggregatorMethods
         attr_query << "SUM(Field_#{i}) as `#{el}`"
       end
 
-      attr_query
-      hash_grouped = { attr_query_name_collumn: attr_query_name_collumn, attr_query: attr_query }
+      { attr_query_name_collumn: attr_query_name_collumn, attr_query: attr_query }  # Возвращаем хеш напрямую
+
     end
 
 
