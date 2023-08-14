@@ -1,7 +1,7 @@
 class MyMailer < ApplicationMailer
   after_action :email_delivered, only: :send_email_with_attachment
 
-  default from: email_address_with_name('svv@invelta.com.ua', 'ТОВ "Технооптторг - Трейд"')
+  default from: email_address_with_name('info@tot.biz.ua', 'ТОВ "Технооптторг - Трейд"')
 
   def send_email_with_attachment(email, file_path)
     date = Date.today

@@ -517,17 +517,15 @@ module CreateFileXlsMethods
               "Интернет-магазин",
               "УкрОборонПром"]
 
-      # email = ["postmaster@tot.biz.ua", "prokoleso_logs@tot.biz.ua",
-      #          "test@tot.biz.ua", "test1@tot.biz.ua",
-      #          "test2@tot.biz.ua", "test3@tot.biz.ua", "test4@tot.biz.ua"]
-
-      email = ["svv@invelta.com.ua", "svv2602@gmail.com"]
+      email = ["postmaster@tot.biz.ua", "prokoleso_logs@tot.biz.ua",
+               "test@tot.biz.ua", "test1@tot.biz.ua",
+               "test2@tot.biz.ua", "test3@tot.biz.ua", "test4@tot.biz.ua",
+               "svv@invelta.com.ua"]
 
       10.times do |i|
         Partner.create!(
           Kontragent: "Контрагент #{i}",
-          Email: email[rand(2)],
-          # Email: email[rand(7)],
+          Email: email[rand(8)],
           Partner: "Партнер #{i}",
           OsnovnoiMeneger: "Менеджер #{i}",
           TelefonPodrazdeleniia: "123-456-789",

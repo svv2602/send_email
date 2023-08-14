@@ -73,8 +73,8 @@ Rails.application.configure do
     address: '192.168.3.25',
     port: 25,
     # domain: 'example.com',
-    user_name: 'svv@invelta.com.ua',
-    password: '44332211',
+    user_name: 'info@tot.biz.ua',
+    password: 'hLs4Ue75R8',
     authentication: :plain,
     enable_starttls_auto: false
   }
