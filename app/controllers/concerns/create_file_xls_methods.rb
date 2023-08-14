@@ -51,6 +51,8 @@ module CreateFileXlsMethods
                                                   border: :thin)
       # Создание стиля с границей
       @border_style = Spreadsheet::Format.new(border: :thin, color: :black)
+      # Создание стиля с границей
+      @border_style_with_right_align = Spreadsheet::Format.new(border: :thin, color: :black, horizontal_align: :right)
 
       settings_price = set_price_sheet_attributes(@hash_value) # хеш настроек для создания листов прайса
 
@@ -94,15 +96,24 @@ module CreateFileXlsMethods
 
       # Заполнение таблицы данными
       grouped_results.each_with_index do |leftover, index|
-        row_values = column_names.map { |column| leftover.send(column) }
+        row_values = column_names.map { |column| format_value(leftover.send(column)) }
         xls_sheet.row(index + 1).push(*row_values)
 
         # Применение стиля с границей к каждой ячейке в строках с данными
         row_values.each_with_index do |cell_value, col_index|
-          xls_sheet.row(index + 1).set_format(col_index, @border_style)
+          # xls_sheet.row(index + 1).set_format(col_index, @border_style)
+
+          format = contains_only_digits_spaces_dots_and_commas?(cell_value) ?   @border_style_with_right_align : @border_style
+          # format = cell_value.is_a?(String) ?  @border_style :  @border_style_with_right_align
+          xls_sheet.row(index + 1).set_format(col_index, format)
         end
       end
 
+    end
+
+    def contains_only_digits_spaces_dots_and_commas?(str)
+      # Проверяем, что строка состоит только из цифр, пробелов, точек и запятых
+      return str.match?(/\A[\d\s.,]+\z/)
     end
 
     def hash_value_keys_partner(tk_ilsh, tk_cmk, tk_shop, skl_pdrzd)
@@ -230,6 +241,18 @@ module CreateFileXlsMethods
       end
 
       list
+    end
+
+    def format_value(value)
+      if value.is_a?(Numeric)
+        format_number_with_thousands(value)
+      else
+        value
+      end
+    end
+
+    def format_number_with_thousands(number)
+      number.to_s.gsub(/(\d)(?=(\d{3})+(?!\d))/, '\\1 ')
     end
 
     #=====================Удалить===========================================
