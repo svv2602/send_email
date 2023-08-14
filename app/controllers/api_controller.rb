@@ -32,18 +32,17 @@ class ApiController < ApplicationController
   end
 
   def send_email
-    export_to_xls
-    file_path = @file_path
+    file_path = "/home/user/RubymineProjects/myProject/send_email/lib/assets/price_aliases.json"
 
     # Здесь указываете email получателя
     recipient_email = 'svv@invelta.com.ua'
     #==============================================================
     # Отправляем письмо с вложением
     # Заблочено - раскомментировать для отправки
-    # MyMailer.send_email_with_attachment(recipient_email, file_path).deliver_now
+    MyMailer.send_email_with_attachment(recipient_email, file_path).deliver_now
 
     # Удалить временный файл
-    File.delete(@file_path) if File.exist?(@file_path)
+    # File.delete(@file_path) if File.exist?(@file_path)
     #==============================================================
 
     # Отображаем результат пользователю
@@ -59,6 +58,7 @@ class ApiController < ApplicationController
   def grup_partner
 
     Email.delete_all # удалить в рабочей
+    test_data_partner # заливает тестовые данные - удалить в рабочей
 
     directory_path = "#{Rails.root}/tmp/prices/"
     FileUtils.mkdir_p(directory_path) unless Dir.exist?(directory_path)
@@ -74,7 +74,7 @@ class ApiController < ApplicationController
     # Обработка результатов
     results.each do |row|
       osnovnoi_meneger = row["OsnovnoiMeneger"]
-      email = row["Email"]
+      recipient_email = row["Email"]
 
       unless params == row["params"]
         # удалить старый прайс
@@ -95,15 +95,8 @@ class ApiController < ApplicationController
 
         params = row["params"]
 
-        # удалить в рабочей
-        # =================================================
-        if kol >= 5
-          break # Выходим из цикла, если значение равно 5
-        end
-        # =================================================
-
       end
-
+      MyMailer.send_email_with_attachment(recipient_email.to_s, @price_path).deliver_now
       i += 1
     end
 

@@ -103,7 +103,7 @@ module CreateFileXlsMethods
         row_values.each_with_index do |cell_value, col_index|
           # xls_sheet.row(index + 1).set_format(col_index, @border_style)
 
-          format = contains_only_digits_spaces_dots_and_commas?(cell_value) ?   @border_style_with_right_align : @border_style
+          format = contains_only_digits_spaces_dots_and_commas?(cell_value) ? @border_style_with_right_align : @border_style
           # format = cell_value.is_a?(String) ?  @border_style :  @border_style_with_right_align
           xls_sheet.row(index + 1).set_format(col_index, format)
         end
@@ -497,6 +497,48 @@ module CreateFileXlsMethods
           "items": "6"
         }
       }
+
+    end
+
+    def test_data_partner
+      Partner.delete_all
+
+      podrazdelenie = ["Одесса ОСПП", "Тендерный отдел",
+                       "Ровно ОСПП", "Львов ОСПП", "Кривой Рог ОСПП",
+                       "", "Тернополь ОСПП"]
+      type = ["B2B",
+              "B2C более 50 т.с",
+              "B2C до 50 т.с.",
+              "Автоимпортер",
+              "Автосалон",
+              "Автосборочное предприятие",
+              "Агрохолдинг",
+              "Гос.организация",
+              "Интернет-магазин",
+              "УкрОборонПром"]
+
+      # email = ["postmaster@tot.biz.ua", "prokoleso_logs@tot.biz.ua",
+      #          "test@tot.biz.ua", "test1@tot.biz.ua",
+      #          "test2@tot.biz.ua", "test3@tot.biz.ua", "test4@tot.biz.ua"]
+
+      email = ["svv@invelta.com.ua", "svv2602@gmail.com"]
+
+      10.times do |i|
+        Partner.create!(
+          Kontragent: "Контрагент #{i}",
+          Email: email[rand(2)],
+          # Email: email[rand(7)],
+          Partner: "Партнер #{i}",
+          OsnovnoiMeneger: "Менеджер #{i}",
+          TelefonPodrazdeleniia: "123-456-789",
+          Gorod: "Город #{i}",
+          TipKontragentaILSh: type[rand(10)],
+          TipKontragentaCMK: type[rand(10)],
+          TipKontragentaSHOP: type[rand(10)],
+          Podrazdelenie: podrazdelenie[rand(7)]
+        )
+
+      end
 
     end
 

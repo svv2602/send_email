@@ -34,11 +34,11 @@ SELECT partners_select.*,
        TipKontragentaILSh || ',' || TipKontragentaCMK || ',' || TipKontragentaSHOP || ',' || Podrazdelenie as params
 FROM
     (SELECT Email                                     AS Email,
-            "дублированный email"                     AS Partner,
-            "дублированный email"                     AS OsnovnoiMeneger,
-            "дублированный email"                     AS TelefonPodrazdeleniia,
-            "дублированный email"                     AS Gorod,
-            "дублированный email"                     AS Podrazdelenie,
+            Partner               AS Partner,
+            OsnovnoiMeneger       AS OsnovnoiMeneger,
+            TelefonPodrazdeleniia AS TelefonPodrazdeleniia,
+            Gorod                 AS Gorod,
+            Podrazdelenie         AS Podrazdelenie,
             GROUP_CONCAT(DISTINCT TipKontragentaILSh) AS TipKontragentaILSh,
             GROUP_CONCAT(DISTINCT TipKontragentaCMK)  AS TipKontragentaCMK,
             GROUP_CONCAT(DISTINCT TipKontragentaSHOP) AS TipKontragentaSHOP
