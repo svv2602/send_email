@@ -60,6 +60,8 @@ class ApiController < ApplicationController
     Email.delete_all # удалить в рабочей
     test_data_partner # заливает тестовые данные - удалить в рабочей
 
+    set_json_files_path("price_settings")
+
     directory_path = "#{Rails.root}/tmp/prices/"
     FileUtils.mkdir_p(directory_path) unless Dir.exist?(directory_path)
 

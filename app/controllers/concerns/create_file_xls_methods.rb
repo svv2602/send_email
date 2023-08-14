@@ -43,6 +43,7 @@ module CreateFileXlsMethods
     end
 
     def create_book_xls
+
       # Создание объекта для XLS-файла
       @xls_file = Spreadsheet::Workbook.new
       # Создание стиля для зеленого фона
@@ -124,6 +125,10 @@ module CreateFileXlsMethods
       }
     end
 
+    def set_json_files_path(price_settings)
+      @file_price_settings_path = "#{Rails.root}/lib/assets/#{price_settings}.json"
+    end
+
     def set_alias(arr_name_columns)
       @file_price_settings_path = "#{Rails.root}/lib/assets/price_aliases.json"
       json_string = File.read(@file_price_settings_path)
@@ -150,7 +155,6 @@ module CreateFileXlsMethods
       tabPartner = db_columns[:Partner]
 
       # hash_value_keys_partner = @hash_value
-      @file_price_settings_path = "#{Rails.root}/lib/assets/price_settings.json"
       json_string = File.read(@file_price_settings_path)
 
       hash_settings = JSON.parse(json_string) # test_setting
@@ -497,9 +501,7 @@ module CreateFileXlsMethods
           "items": "6"
         }
       }
-
     end
-
     def test_data_partner
       Partner.delete_all
 
