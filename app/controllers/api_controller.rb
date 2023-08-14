@@ -129,6 +129,7 @@ class ApiController < ApplicationController
   def attr_price
     # Получить данные и создать файлы settings.json и alias.json
     get_json_files_from_api
+    render plain: @msg_data_load + "\nОтчет создан: #{Time.now}"
   end
 
 end

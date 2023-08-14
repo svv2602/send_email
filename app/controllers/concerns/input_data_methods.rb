@@ -71,7 +71,7 @@ module InputDataMethods
 
     def get_json_files_from_api
       # запись на диск данных с настройками прайса
-      attr_path = ['settings', 'alias']
+      attr_path = ['settings', 'aliases']
       directory_path = "#{Rails.root}/lib/assets"
       FileUtils.mkdir_p(directory_path) unless Dir.exist?(directory_path)
 
@@ -86,11 +86,10 @@ module InputDataMethods
           @msg_data_load_select = "Не удалось получить данные #{el} из API."
         end
         puts @msg_data_load_select
-
+        @msg_data_load ||= ""
+        @msg_data_load += @msg_data_load_select
       end
 
-      @msg_data_load ||= ""
-      @msg_data_load += @msg_data_load_select
     end
 
     def db_columns

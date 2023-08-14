@@ -32,12 +32,14 @@ module CreateFileXlsMethods
     end
 
     def find_value_product(product_el)
-      str = product_el.gsub(" ", "")
+      normalized_key = product_el.gsub(" ", "").downcase
       hash_product = db_columns[:Product]
+
       hash_product.each do |key, value|
-        str = value if key.to_s.downcase == str.downcase
+        return value if key.to_s.downcase == normalized_key
       end
-      str
+
+      product_el
     end
 
     def create_book_xls
@@ -78,11 +80,10 @@ module CreateFileXlsMethods
       xls_sheet = @xls_file.create_worksheet(name: @sheet_name)
       # Добавление заголовков в таблицу XLS
       column_names = hash_grouped_name_collumns(hash_with_params_sklad)[:attr_query_name_collumn]
-      puts "column_names: #{column_names}"
 
+      # Формирование заголовков с alias
       new_column_names = column_names.map { |element| find_value_product(element) }
-
-      xls_sheet.row(0).concat new_column_names
+      xls_sheet.row(0).concat set_alias(new_column_names)
 
       # Применение стиля к каждой ячейке заголовков, если она содержит значение
       new_column_names.each_with_index do |value, col_index|
@@ -110,6 +111,28 @@ module CreateFileXlsMethods
         TipKontragentaSHOP: tk_shop,
         Podrazdelenie: skl_pdrzd
       }
+    end
+
+    def set_alias(arr_name_columns)
+      @file_price_settings_path = "#{Rails.root}/lib/assets/price_aliases.json"
+      json_string = File.read(@file_price_settings_path)
+      arr_aliases = JSON.parse(json_string).to_a
+      result = []
+
+      arr_name_columns.each do |name_column|
+        found_alias = nil
+
+        arr_aliases.each do |alias_hash|
+          if alias_hash["Объект"] == name_column
+            found_alias = alias_hash["Алиас"]
+            break
+          end
+        end
+
+        result << (found_alias || name_column)
+      end
+
+      result
     end
 
     def set_price_sheet_attributes(hash_value)
