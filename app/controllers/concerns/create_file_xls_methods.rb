@@ -14,7 +14,7 @@ module CreateFileXlsMethods
 
     end
 
-    def find_key(product_el)
+    def find_key_product(product_el)
       str = product_el.gsub(" ", "")
       hash_product = db_columns[:Product]
       hash_product.each do |key, value|
@@ -26,9 +26,18 @@ module CreateFileXlsMethods
     def create_new_arr_product(arr_product)
       arr = []
       arr_product.each do |product_el|
-        arr << find_key(product_el)
+        arr << find_key_product(product_el)
       end
       arr.uniq.reject { |value| value.empty? }
+    end
+
+    def find_value_product(product_el)
+      str = product_el.gsub(" ", "")
+      hash_product = db_columns[:Product]
+      hash_product.each do |key, value|
+        str = value if key.to_s.downcase == str.downcase
+      end
+      str
     end
 
     def create_book_xls
@@ -46,7 +55,6 @@ module CreateFileXlsMethods
       settings_price.each do |key, el_hash|
         creat_sheet_xls(el_hash)
       end
-
 
       xls_data = StringIO.new
       @xls_file.write xls_data
@@ -70,11 +78,14 @@ module CreateFileXlsMethods
       xls_sheet = @xls_file.create_worksheet(name: @sheet_name)
       # Добавление заголовков в таблицу XLS
       column_names = hash_grouped_name_collumns(hash_with_params_sklad)[:attr_query_name_collumn]
+      puts "column_names: #{column_names}"
 
-      xls_sheet.row(0).concat column_names
+      new_column_names = column_names.map { |element| find_value_product(element) }
+
+      xls_sheet.row(0).concat new_column_names
 
       # Применение стиля к каждой ячейке заголовков, если она содержит значение
-      column_names.each_with_index do |value, col_index|
+      new_column_names.each_with_index do |value, col_index|
         if value.present?
           xls_sheet.row(0).set_format(col_index, @green_background)
         end
@@ -92,7 +103,6 @@ module CreateFileXlsMethods
       end
 
     end
-
 
     def hash_value_keys_partner(tk_ilsh, tk_cmk, tk_shop, skl_pdrzd)
       { TipKontragentaILSh: tk_ilsh,
@@ -198,9 +208,6 @@ module CreateFileXlsMethods
 
       list
     end
-
-
-
 
     #=====================Удалить===========================================
     def test_setting
