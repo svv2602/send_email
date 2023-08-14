@@ -125,12 +125,13 @@ module CreateFileXlsMethods
       }
     end
 
-    def set_json_files_path(price_settings)
+    def set_json_files_path(price_settings, price_aliases)
       @file_price_settings_path = "#{Rails.root}/lib/assets/#{price_settings}.json"
+      @file_price_settings_path = "#{Rails.root}/lib/assets/#{price_aliases}.json"
     end
 
     def set_alias(arr_name_columns)
-      @file_price_settings_path = "#{Rails.root}/lib/assets/price_aliases.json"
+
       json_string = File.read(@file_price_settings_path)
       arr_aliases = JSON.parse(json_string).to_a
       result = []
