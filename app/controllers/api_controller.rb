@@ -28,7 +28,11 @@ class ApiController < ApplicationController
     else
       render plain: "Список клиентов пуст. Вы скорее всего уже сделали рассылку \n Проверьте отчет о рассылке `/report`"
     end
+  end
 
+  def test_send_emails
+    set_test_data
+    send_emails_to_partners
   end
 
   def delete_old_emails
