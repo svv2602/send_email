@@ -127,12 +127,12 @@ module CreateFileXlsMethods
 
     def set_json_files_path(price_settings, price_aliases)
       @file_price_settings_path = "#{Rails.root}/lib/assets/#{price_settings}.json"
-      @file_price_settings_path = "#{Rails.root}/lib/assets/#{price_aliases}.json"
+      @file_price_aliases_path = "#{Rails.root}/lib/assets/#{price_aliases}.json"
     end
 
     def set_alias(arr_name_columns)
 
-      json_string = File.read(@file_price_settings_path)
+      json_string = File.read(@file_price_aliases_path)
       arr_aliases = JSON.parse(json_string).to_a
       result = []
 
@@ -160,7 +160,7 @@ module CreateFileXlsMethods
 
       hash_settings = JSON.parse(json_string) # test_setting
       #===========================================================
-      hash_settings = test_setting
+      # hash_settings = test_setting
       # временные переменные, заменить на получаемые по API
       # ===========================================================
 
@@ -179,19 +179,19 @@ module CreateFileXlsMethods
           # ====================================================
           # Название листа в файле и максимальное количество
           # ====================================================
-          sheet_name = value[:name] || key.to_s
-          max_count = value[:items].to_i
+          sheet_name = value["name"] || key.to_s
+          max_count = value["items"].to_i
 
           # ====================================================
           # Массив свойств номенлатуры
           # ====================================================
-          product = value[:settings].is_a?(Hash) && value[:settings][:Свойства] ? value[:settings][:Свойства] : []
+          product = value["settings"].is_a?(Hash) && value["settings"]["Свойства"] ? value["settings"]["Свойства"] : []
 
           # ====================================================
           # Определение фильтров по видам номенклатуры и категоий товара
           # ====================================================
-          ktg = value[:settings].is_a?(Hash) && value[:settings][:ТоварнаяКатегория] ? value[:settings][:ТоварнаяКатегория] : []
-          vid = value[:settings].is_a?(Hash) && value[:settings][:ВидНоменклатуры] ? value[:settings][:ВидНоменклатуры] : []
+          ktg = value["settings"].is_a?(Hash) && value["settings"]["ТоварнаяКатегория"] ? value["settings"]["ТоварнаяКатегория"] : []
+          vid = value["settings"].is_a?(Hash) && value["settings"]["ВидНоменклатуры"] ? value["settings"]["ВидНоменклатуры"] : []
 
           sheet_select_product = {
             TovarnayaKategoriya: ktg,
@@ -201,19 +201,19 @@ module CreateFileXlsMethods
           # ====================================================
           # Определение типов цен для контрагента по листам
           # ====================================================
+          if value["settings"]["ТипыЦен"].is_a?(Hash) && value["settings"]["ТипыЦен"]
 
-          if value[:settings][:ТипыЦен].is_a?(Hash) && value[:settings][:ТипыЦен]
-            if value[:settings][:ТипыЦен][:maintype]
-              result = value[:settings][:ТипыЦен][:maintype].downcase
+            if value["settings"]["ТипыЦен"]["maintype"]
+              result = value["settings"]["ТипыЦен"]["maintype"].downcase
               result2 = tabPartner.find { |key, value| value.downcase == result }
             else
               result2 = ""
             end
 
-            value[:settings][:ТипыЦен][:settings].each do |el|
+            value["settings"]["ТипыЦен"]["settings"].each do |el|
               el.each do |key, value|
-                price << el[:default] if key == :default
-                price << el[:prices] if el[:type] == result2
+                price << el["default"] if key == "default"
+                price << el["prices"] if el["type"] == result2
               end
             end
             price = price.flatten.uniq
@@ -226,8 +226,8 @@ module CreateFileXlsMethods
           # ====================================================
           podrazdel << hash_value[:Podrazdelenie]
 
-          value[:settings][:Склады].each do |el|
-            el[:ЭтоГруппа] == "Да" ? grup << el[:Склад] : skl << el[:Склад]
+          value["settings"]["Склады"].each do |el|
+            el["ЭтоГруппа"] == "Да" ? grup << el["Склад"] : skl << el["Склад"]
           end
 
           list[key] = { sheet_name: sheet_name,
@@ -503,6 +503,7 @@ module CreateFileXlsMethods
         }
       }
     end
+
     def test_data_partner
       Partner.delete_all
 

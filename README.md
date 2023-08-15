@@ -1,6 +1,12 @@
 # README
-
 ### Приложение для рассылки прайсов
+
+
+## !!! В производстве необходимо
+* в `def grup_partner` установить рабочие назавания json-файлов в `set_json_files_path("price_settings_copy", "price_aliases_copy")` 
+* в `def grup_partner` удалить Email.delete_all и  test_data_partner
+
+
 
 ### Настройка в app/controllers/concerns/input_data_methods.rb
 * адреса API для загрузки в прописаны  в `params_table`

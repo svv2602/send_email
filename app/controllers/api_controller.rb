@@ -57,8 +57,10 @@ class ApiController < ApplicationController
 
   def grup_partner
 
+    # !!!!!!!!!!!!! удалить в рабочей ===========================
     Email.delete_all # удалить в рабочей
     test_data_partner # заливает тестовые данные - удалить в рабочей
+    # ===========================
 
     # !!!!!!!!!!!!! изменить на рабочие
     set_json_files_path("price_settings_copy", "price_aliases_copy")
