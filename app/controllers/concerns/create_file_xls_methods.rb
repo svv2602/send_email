@@ -320,10 +320,10 @@ module CreateFileXlsMethods
               "Интернет-магазин",
               "УкрОборонПром"]
 
-      # email = ["postmaster@tot.biz.ua", "prokoleso_logs@tot.biz.ua",
-      #          "test@tot.biz.ua", "test1@tot.biz.ua",
-      #          "test2@tot.biz.ua", "test3@tot.biz.ua", "test4@tot.biz.ua"]
-      email = ["svv@invelta.com.ua"]
+      email = ["postmaster@tot.biz.ua", "prokoleso_logs@tot.biz.ua",
+               "test@tot.biz.ua", "test1@tot.biz.ua",
+               "test2@tot.biz.ua", "test3@tot.biz.ua", "test4@tot.biz.ua"]
+
 
       10.times do |i|
         Partner.create!(
