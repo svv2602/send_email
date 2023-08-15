@@ -17,4 +17,5 @@ EXPOSE 3000
 CMD ["rails", "server", "-b", "0.0.0.0"]
 
 # Запуск
-# docker run --rm -p 3000:3000 my-rails-app
+# docker build -t send_email .
+# docker run --rm -p 3000:3000 send_email

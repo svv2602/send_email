@@ -49,7 +49,7 @@ module InputDataMethods
     def import_data_load
       # удалить тестовые данные
       Partner.delete_all if Partner.exists?(test: true)
-
+      @msg_data_load = ""
       params_table.each do |el|
         max_update_date = el[:table_key].to_s.capitalize.singularize.constantize.maximum(:updated_at)
 
