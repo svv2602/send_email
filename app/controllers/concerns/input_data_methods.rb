@@ -64,7 +64,6 @@ module InputDataMethods
           end
         end
       end
-      set_settings_price_from_api # получить настройки прайсов и записать в json-файл
 
     end
 

@@ -4,5 +4,6 @@ Rails.application.routes.draw do
   get 'send', to: 'api#send_emails_to_partners'
   get 'report', to: 'api#report'
   get 'attr', to: 'api#attr_price'
+  get 'data', to: 'api#data_price'
   root 'readme#show'
 end

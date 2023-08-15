@@ -14,6 +14,7 @@ class ApiController < ApplicationController
     unless DataWriteStatus.in_progress?
       DataWriteStatus.set_in_progress(true)
       import_data_load
+      get_json_files_from_api
       DataWriteStatus.set_in_progress(false)
     else
       @msg_data_load = "Процесс уже запущен"
@@ -64,6 +65,12 @@ class ApiController < ApplicationController
   def attr_price
     # Получить данные и создать файлы settings.json и alias.json
     get_json_files_from_api
+    render plain: @msg_data_load + "\nОтчет создан: #{Time.now}"
+  end
+
+  def data_price
+    # Получить данные в базу данных
+    import_data_load
     render plain: @msg_data_load + "\nОтчет создан: #{Time.now}"
   end
 
