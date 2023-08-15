@@ -47,6 +47,8 @@ module InputDataMethods
     end
 
     def import_data_load
+      # удалить тестовые данные
+      Partner.delete_all if Partner.exists?(test: true)
 
       params_table.each do |el|
         max_update_date = el[:table_key].to_s.capitalize.singularize.constantize.maximum(:updated_at)
@@ -66,7 +68,6 @@ module InputDataMethods
       end
 
     end
-
 
     def get_json_files_from_api
       # запись на диск данных с настройками прайса
