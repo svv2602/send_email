@@ -51,7 +51,7 @@ module InputDataMethods
       params_table.each do |el|
         max_update_date = el[:table_key].to_s.capitalize.singularize.constantize.maximum(:updated_at)
 
-        if max_update_date && max_update_date.to_date > Date.current
+        if max_update_date && max_update_date.to_date == Date.current
           @msg_data_load_select = "Данные #{el[:table_key].to_s} были загружены  #{max_update_date} и не требуют обновления \n"
           puts @msg_data_load_select
           @msg_data_load += @msg_data_load_select
