@@ -10,10 +10,13 @@ class ApiController < ApplicationController
   after_action :delete_old_emails, only: :import_data_from_api
 
   def import_data_from_api
+
     @msg_data_load = ""
     unless DataWriteStatus.in_progress?
       DataWriteStatus.set_in_progress(true)
+      # import_data_load - Будет пропущена для таблиц у которых данные с текущей датой уже есть
       import_data_load
+      # get_json_files_from_api - делаем всегда, нет проверки по времени создания файла
       get_json_files_from_api
       DataWriteStatus.set_in_progress(false)
     else
