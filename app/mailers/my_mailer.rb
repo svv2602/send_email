@@ -8,7 +8,7 @@ class MyMailer < ApplicationMailer
     formatted_date = date.strftime('%d_%m_%Y')
 
     attachments["price#{formatted_date}.xls"] = File.read(file_path)
-    unsubscribe_url = "https://www.tot.biz.ua/unsubscribe?email=#{email}"
+    unsubscribe_url = "https://www.tot.biz.ua/price?unsubscribe=#{email}"
 
     mail(to: email, subject: "price #{formatted_date}") do |format|
       format.html {
