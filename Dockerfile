@@ -17,4 +17,4 @@ EXPOSE 3000
 CMD ["rails", "server", "-b", "0.0.0.0"]
 
 # Запуск
-# docker run -p 3000:3000  my-rails-app
+# docker run --rm -p 3000:3000 my-rails-app

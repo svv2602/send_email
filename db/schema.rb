@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2023_08_09_053616) do
+ActiveRecord::Schema[7.0].define(version: 2023_08_15_061646) do
   create_table "data_write_statuses", force: :cascade do |t|
     t.boolean "in_progress"
     t.datetime "created_at", null: false
@@ -51,6 +51,7 @@ ActiveRecord::Schema[7.0].define(version: 2023_08_09_053616) do
     t.string "TipKontragentaILSh", default: ""
     t.string "TipKontragentaCMK", default: ""
     t.string "TipKontragentaSHOP", default: ""
+    t.boolean "test", default: false
   end
 
   create_table "prices", force: :cascade do |t|

@@ -331,15 +331,16 @@ module CreateFileXlsMethods
       10.times do |i|
         Partner.create!(
           Kontragent: "Контрагент #{i}",
-          Email: email[rand(8)],
+          Email: email[rand(email.size)],
           Partner: "Партнер #{i}",
           OsnovnoiMeneger: "Менеджер #{i}",
           TelefonPodrazdeleniia: "123-456-789",
           Gorod: "Город #{i}",
-          TipKontragentaILSh: type[rand(10)],
-          TipKontragentaCMK: type[rand(10)],
-          TipKontragentaSHOP: type[rand(10)],
-          Podrazdelenie: podrazdelenie[rand(7)]
+          TipKontragentaILSh: type[rand(type.size)],
+          TipKontragentaCMK: type[rand(type.size)],
+          TipKontragentaSHOP: type[rand(type.size)],
+          Podrazdelenie: podrazdelenie[rand(podrazdelenie.size)],
+          test: true
         )
 
       end
