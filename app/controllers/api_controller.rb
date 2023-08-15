@@ -65,13 +65,13 @@ class ApiController < ApplicationController
     render plain: str_head + @msg_data_load + "\nОтчет создан: #{Time.now}"
   end
 
-  def attr_price
+  def import_attr
     # Получить данные и создать файлы settings.json и alias.json
     get_json_files_from_api
     render plain: @msg_data_load + "\nОтчет создан: #{Time.now}"
   end
 
-  def data_price
+  def import_data
     # Получить данные в базу данных
     import_data_load
     render plain: @msg_data_load + "\nОтчет создан: #{Time.now}"
