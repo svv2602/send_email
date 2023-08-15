@@ -38,10 +38,7 @@ class ApiController < ApplicationController
   end
 
 
-
   def report
-    # Получить все успешно доставленные письма за последние 7 дней
-    # deliveries = Email.where('created_at > ?', Time.now - 7.days)
     if params[:send].to_i == 0
       params_send = true
       str_head = "Список адресов, ожидающих отправки:\n\n"
@@ -49,7 +46,13 @@ class ApiController < ApplicationController
       params_send = false
       str_head = "Список рассылок email за сегодня:\n\n"
     end
-    request_report(params_send)
+    request = request_report(params_send)
+
+    if request.count == 0
+      @msg_data_load = "в базе нет данных\n\n"
+    else
+      report_out(request, params_send)
+    end
 
     render plain: str_head + @msg_data_load + "\nОтчет создан: #{Time.now}"
   end

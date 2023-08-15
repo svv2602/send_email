@@ -93,6 +93,10 @@ ORDER BY Email;
         deliveries = Email.where("DATE(emails.created_at) = DATE('now')")
       end
 
+      deliveries
+    end
+
+    def report_out(deliveries, params_send)
       @msg_data_load = ""
       # Вывести email-адреса получателей
       deliveries.each_with_index do |delivery, i|
