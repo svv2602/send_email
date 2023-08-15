@@ -10,7 +10,11 @@ class ApiController < ApplicationController
   after_action :delete_old_emails, only: :import_data_from_api
 
   def import_data_from_api
+    run_import_data_from_api
+    render plain: @msg_data_load + "\n\n#{Time.now}"
+  end
 
+  def run_import_data_from_api
     @msg_data_load = ""
     unless DataWriteStatus.in_progress?
       DataWriteStatus.set_in_progress(true)
@@ -22,7 +26,7 @@ class ApiController < ApplicationController
     else
       @msg_data_load = "Процесс уже запущен"
     end
-    render plain: @msg_data_load + "\n\n#{Time.now}"
+    @msg_data_load
   end
 
   def send_emails_to_partners
@@ -34,9 +38,24 @@ class ApiController < ApplicationController
     end
   end
 
-  def test_send_emails
-    set_test_data
+  def send_emails
+    # Получить данные
+    run_import_data_from_api
+
+    # Установить файлы с настройками прайсов (раскомментировать нужное):
+    # ================================================================
+    # Путь к файлам lib/assets/
+    # Использовать тестовые файлы
+    set_json_files_path("price_settings_test", "price_aliases_test")
+
+    # Использовать файлы, полученные по API
+    # set_json_files_path("price_settings", "price_aliases")
+    # ================================================================
+
+    # Без параметров -отправка тестовому списку клиентов
+    set_test_data unless params[:production].to_i == 1
     send_emails_to_partners
+
   end
 
   def delete_old_emails
@@ -44,7 +63,6 @@ class ApiController < ApplicationController
     Email.where('created_at < ?', days_ago).destroy_all
     puts "Удалены все записи из Email, старше #{days_ago} дней."
   end
-
 
   def report
     if params[:send].to_i == 0

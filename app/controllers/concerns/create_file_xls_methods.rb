@@ -50,10 +50,6 @@ module CreateFileXlsMethods
 
     def create_and_send_price_to_partner_groups
 
-      # !!!!!!!!!!!!! изменить на рабочие
-      set_json_files_path("price_settings_copy", "price_aliases_copy")
-
-
       directory_path = "#{Rails.root}/tmp/prices/"
       FileUtils.mkdir_p(directory_path) unless Dir.exist?(directory_path)
 
