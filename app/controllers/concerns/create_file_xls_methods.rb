@@ -42,6 +42,59 @@ module CreateFileXlsMethods
       product_el
     end
 
+    def create_and_send_price_to_partner_groups
+
+      # !!!!!!!!!!!!! удалить в рабочей ===========================
+      Email.delete_all # удалить в рабочей
+      test_data_partner # заливает тестовые данные - удалить в рабочей
+      # ===========================
+
+      # !!!!!!!!!!!!! изменить на рабочие
+      set_json_files_path("price_settings_copy", "price_aliases_copy")
+
+      directory_path = "#{Rails.root}/tmp/prices/"
+      FileUtils.mkdir_p(directory_path) unless Dir.exist?(directory_path)
+
+      name_price = "price"
+      @price_path = "#{directory_path}#{name_price}.xls"
+
+      results = list_partners_to_send_email # получить список клиентов не получивших почту сегодня
+      kol = 0
+      i = 0
+      params = nil
+
+      # Обработка результатов
+      results.each do |row|
+        osnovnoi_meneger = row["OsnovnoiMeneger"]
+        recipient_email = row["Email"]
+
+        unless params == row["params"]
+          # удалить старый прайс
+          File.delete(@price_path) if File.exist?(@price_path)
+
+          # создать новый прайс
+          @hash_value = hash_value_keys_partner(row["TipKontragentaILSh"],
+                                                row["TipKontragentaCMK"],
+                                                row["TipKontragentaSHOP"],
+                                                row["Podrazdelenie"])
+
+          settings_price = set_price_sheet_attributes(@hash_value) # хеш настроек для создания листов прайса
+          # puts "settings_price = #{settings_price}"
+          kol += 1
+          name_price = "price#{kol}"
+          @price_path = "#{directory_path}#{name_price}.xls"
+          create_book_xls
+
+          params = row["params"]
+
+        end
+        MyMailer.send_email_with_attachment(recipient_email.to_s, @price_path).deliver_now
+        i += 1
+      end
+
+
+    end
+
     def create_book_xls
 
       # Создание объекта для XLS-файла
@@ -525,11 +578,14 @@ module CreateFileXlsMethods
                "test@tot.biz.ua", "test1@tot.biz.ua",
                "test2@tot.biz.ua", "test3@tot.biz.ua", "test4@tot.biz.ua",
                "svv@invelta.com.ua"]
+      email_1 = ["svv2602@gmail.com",
+               "svv@invelta.com.ua"]
 
       10.times do |i|
         Partner.create!(
           Kontragent: "Контрагент #{i}",
-          Email: email[rand(8)],
+          Email: email_1[rand(2)],
+          # Email: email[rand(8)],
           Partner: "Партнер #{i}",
           OsnovnoiMeneger: "Менеджер #{i}",
           TelefonPodrazdeleniia: "123-456-789",

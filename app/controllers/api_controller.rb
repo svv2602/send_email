@@ -21,32 +21,14 @@ class ApiController < ApplicationController
     render plain: @msg_data_load + "\n\n#{Time.now}"
   end
 
-  def create_xls
+  def send_emails_to_partners
     if list_partners_to_send_email.any?
-      export_to_xls
-      render plain: "Создан новый прайс  #{@file_path} \n #{Time.now}"
+      create_and_send_price_to_partner_groups
+      render plain: "Процесс рассылки писем закончен  #{@file_path} \n #{Time.now}"
     else
       render plain: "Список клиентов пуст. Вы скорее всего уже сделали рассылку \n Проверьте отчет о рассылке `/report`"
     end
 
-  end
-
-  def send_email
-    file_path = "/home/user/RubymineProjects/myProject/send_email/lib/assets/price_aliases.json"
-
-    # Здесь указываете email получателя
-    recipient_email = 'svv@invelta.com.ua'
-    #==============================================================
-    # Отправляем письмо с вложением
-    # Заблочено - раскомментировать для отправки
-    MyMailer.send_email_with_attachment(recipient_email, file_path).deliver_now
-
-    # Удалить временный файл
-    # File.delete(@file_path) if File.exist?(@file_path)
-    #==============================================================
-
-    # Отображаем результат пользователю
-    render plain: 'Email sent successfully!'
   end
 
   def delete_old_emails
@@ -55,59 +37,7 @@ class ApiController < ApplicationController
     puts "Удалены все записи из Email, старше #{days_ago} дней."
   end
 
-  def grup_partner
 
-    # !!!!!!!!!!!!! удалить в рабочей ===========================
-    Email.delete_all # удалить в рабочей
-    test_data_partner # заливает тестовые данные - удалить в рабочей
-    # ===========================
-
-    # !!!!!!!!!!!!! изменить на рабочие
-    set_json_files_path("price_settings_copy", "price_aliases_copy")
-
-    directory_path = "#{Rails.root}/tmp/prices/"
-    FileUtils.mkdir_p(directory_path) unless Dir.exist?(directory_path)
-
-    name_price = "price"
-    @price_path = "#{directory_path}#{name_price}.xls"
-
-    results = list_partners_to_send_email # получить список клиентов не получивших почту сегодня
-    kol = 0
-    i = 0
-    params = nil
-
-    # Обработка результатов
-    results.each do |row|
-      osnovnoi_meneger = row["OsnovnoiMeneger"]
-      recipient_email = row["Email"]
-
-      unless params == row["params"]
-        # удалить старый прайс
-        #  File.delete(@price_path) if File.exist?(@price_path)
-
-        # создать новый прайс
-        @hash_value = hash_value_keys_partner(row["TipKontragentaILSh"],
-                                              row["TipKontragentaCMK"],
-                                              row["TipKontragentaSHOP"],
-                                              row["Podrazdelenie"])
-
-        settings_price = set_price_sheet_attributes(@hash_value) # хеш настроек для создания листов прайса
-        # puts "settings_price = #{settings_price}"
-        kol += 1
-        name_price = "price#{kol}"
-        @price_path = "#{directory_path}#{name_price}.xls"
-        create_book_xls
-
-        params = row["params"]
-
-      end
-      MyMailer.send_email_with_attachment(recipient_email.to_s, @price_path).deliver_now
-      i += 1
-    end
-
-    render plain: "Сделано #{kol} разa для  #{i} записей"
-
-  end
 
   def report
     # Получить все успешно доставленные письма за последние 7 дней
