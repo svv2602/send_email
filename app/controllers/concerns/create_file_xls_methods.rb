@@ -59,8 +59,6 @@ module CreateFileXlsMethods
       @price_path = "#{directory_path}#{name_price}.xls"
 
       results = list_partners_to_send_email # получить список клиентов не получивших почту сегодня
-      kol = 0
-      i = 0
       params = nil
 
       # Обработка результатов
@@ -68,30 +66,24 @@ module CreateFileXlsMethods
         osnovnoi_meneger = row["OsnovnoiMeneger"]
         recipient_email = row["Email"]
 
+        # При изменении params создать новый прайс
         unless params == row["params"]
           # удалить старый прайс
           File.delete(@price_path) if File.exist?(@price_path)
-
           # создать новый прайс
           @hash_value = hash_value_keys_partner(row["TipKontragentaILSh"],
                                                 row["TipKontragentaCMK"],
                                                 row["TipKontragentaSHOP"],
                                                 row["Podrazdelenie"])
 
-          settings_price = set_price_sheet_attributes(@hash_value) # хеш настроек для создания листов прайса
-          # puts "settings_price = #{settings_price}"
-          kol += 1
-          name_price = "price#{kol}"
-          @price_path = "#{directory_path}#{name_price}.xls"
+          set_price_sheet_attributes(@hash_value) # хеш настроек для создания листов прайса
           create_book_xls
-
           params = row["params"]
-
         end
-        MyMailer.send_email_with_attachment(recipient_email.to_s, @price_path).deliver_now
-        i += 1
-      end
 
+        # отправить прайс
+        MyMailer.send_email_with_attachment(recipient_email.to_s, @price_path).deliver_now
+      end
 
     end
 
