@@ -8,6 +8,7 @@ class ApiController < ApplicationController
   include CreateFileXlsMethods
 
   after_action :delete_old_emails, only: :import_data_from_api
+  before_action :set_msg_data_load, only: %i[import_data_from_api send_emails import_attr import_data report]
 
   def import_data_from_api
     run_import_data_from_api
@@ -15,26 +16,15 @@ class ApiController < ApplicationController
   end
 
   def run_import_data_from_api
-    @msg_data_load = ""
-    unless DataWriteStatus.in_progress?
-      DataWriteStatus.set_in_progress(true)
-      # import_data_load - Будет пропущена для таблиц у которых данные с текущей датой уже есть
-      import_data_load
-      # get_json_files_from_api - делаем всегда, нет проверки по времени создания файла
-      get_json_files_from_api
-      DataWriteStatus.set_in_progress(false)
-    else
-      @msg_data_load = "Процесс уже запущен"
-    end
-    @msg_data_load
+    run_methods(:import_data_load, :get_json_files_from_api)
   end
 
   def send_emails_to_partners
     if list_partners_to_send_email.any?
       create_and_send_price_to_partner_groups
-      render plain: "Процесс рассылки писем закончен  #{@file_path} \n #{Time.now}"
+      @msg_data_load += "Процесс рассылки писем закончен  #{@file_path} "
     else
-      render plain: "Список клиентов пуст. Вы скорее всего уже сделали рассылку \n Проверьте отчет о рассылке `/report`"
+      @msg_data_load += "Список клиентов пуст. Вы скорее всего уже сделали рассылку \n Проверьте отчет о рассылке `/report`"
     end
   end
 
@@ -52,10 +42,12 @@ class ApiController < ApplicationController
     # set_json_files_path("price_settings", "price_aliases")
     # ================================================================
 
-    # Без параметров -отправка тестовому списку клиентов
+    # Проверка, если Без параметров - отправка тестовому списку клиентов
     set_test_data unless params[:production].to_i == 1
-    send_emails_to_partners
 
+    # Выполнить отправку  почты
+    run_methods(:send_emails_to_partners)
+    render plain: @msg_data_load + "\n\n #{Time.now}"
   end
 
   def delete_old_emails
@@ -85,14 +77,37 @@ class ApiController < ApplicationController
 
   def import_attr
     # Получить данные и создать файлы settings.json и alias.json
-    get_json_files_from_api
+    run_methods(:get_json_files_from_api)
     render plain: @msg_data_load + "\nОтчет создан: #{Time.now}"
   end
 
   def import_data
     # Получить данные в базу данных
-    import_data_load
+    run_methods(:import_data_load)
     render plain: @msg_data_load + "\nОтчет создан: #{Time.now}"
+
+  end
+  def set_msg_data_load
+    @msg_data_load = ""
+  end
+
+  def run_methods(*method_names)
+    unless DataWriteStatus.in_progress?
+      DataWriteStatus.set_in_progress(true)
+
+      method_names.each do |method_name|
+        if respond_to?(method_name)
+          send(method_name)
+        else
+          puts "Метод #{method_name} не существует"
+        end
+      end
+
+      DataWriteStatus.set_in_progress(false)
+    else
+      @msg_data_load = "Процесс уже запущен"
+    end
+    @msg_data_load
   end
 
 end
