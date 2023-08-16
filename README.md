@@ -8,7 +8,7 @@
   * `/import_data` - Получить данные для базы данных
 * `/report?send=1` или `/report` - просмотреть список отправленных писем за текущий день можно по адресу
 * `/report?send=0` - просмотреть список адресов к отправке
-* `/send` - Отправить прайсы тестовой группе партнеров. (изменить список в app/controllers/concerns/create_file_xls_methods.rb метод: set_test_data_partner)
+* `/send` - Отправить прайсы тестовой группе партнеров. (изменить список можно в `app/controllers/concerns/create_file_xls_methods.rb` метод: `set_test_data_partner`)
 
 #### Внимание!
 * `/send?production=1` - Отправить прайсы по списку из 1с8. Для каждой группы клиентов формируется и отправляется свой прайс. При повторном запуске в течении дня отправка писем только тем, у кого нет записи в таблице Email с текущей датой
@@ -51,7 +51,7 @@
 * config/environments/development.rb
 * config/environments/production.rb
 
-### Изменение теста письма для рассылки 
+### Изменение текста письма для рассылки 
 * `app/views/my_mailer/send_email_with_attachment.html.erb`
 
 ### Настройки почты в app/mailers/my_mailer.rb
@@ -59,7 +59,7 @@
 * `unsubscribe_url` - адрес для отписки от рассылки в методе `send_email_with_attachment`
 
 ### Получение списка клиентов для рассылки
-*  в app/controllers/concerns/data_access_methods.rb запрос в методе list_partners_to_send_email 
+*  в app/controllers/concerns/data_access_methods.rb запрос в методе `list_partners_to_send_email` 
 (отбираются только те клиенты, которым за текущий день еще не отправлялись прайсы)
 
 
