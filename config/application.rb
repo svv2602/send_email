@@ -20,18 +20,15 @@ module SendEmail
     # config.eager_load_paths << Rails.root.join("extras")
     config.autoload_paths += Dir["#{config.root}/lib/**/"]
 
-
     #===================15.08.2023================================
-    # Закомментировать при разворачивании - может выдать ошибку
-    # failed to solve: executor failed running [/bin/sh -c rails db:migrate]:
     config.after_initialize do
-      if DataWriteStatus.in_progress?
-        DataWriteStatus.set_in_progress(false)
+      if ActiveRecord::Base.connection.table_exists?('data_write_statuses')
+        if DataWriteStatus.respond_to?(:in_progress?) && DataWriteStatus.respond_to?(:set_in_progress)
+          DataWriteStatus.set_in_progress(false) if DataWriteStatus.in_progress?
+        end
       end
     end
     #=============================================================
-
-
 
   end
 end
