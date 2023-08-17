@@ -166,7 +166,8 @@ module CreateFileXlsMethods
 
     def contains_only_digits_spaces_dots_and_commas?(str)
       # Проверяем, что строка состоит только из цифр, пробелов, точек и запятых
-      return str.match?(/\A(?:\d+(?:[.,]\d*)?|\>\d+)\z/)
+      # return str.match?(/\A(?:\d+(?:[.,]\d*)?|\>\d+)\z/)
+      return str.match?(/\A(?:\d+(?:[.,]\d*)?|\>\d+|[\d\s.,]+)\z/)
     end
 
     def hash_value_keys_partner(tk_ilsh, tk_cmk, tk_shop, skl_pdrzd)
