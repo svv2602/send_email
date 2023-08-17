@@ -43,9 +43,9 @@ module CreateFileXlsMethods
     end
 
     def set_test_data
-        Email.delete_all
-        Partner.delete_all
-        set_test_data_partner
+      Email.delete_all
+      Partner.delete_all
+      set_test_data_partner
     end
 
     def create_and_send_price_to_partner_groups
@@ -89,14 +89,18 @@ module CreateFileXlsMethods
 
       # Создание объекта для XLS-файла
       @xls_file = Spreadsheet::Workbook.new
+
       # Создание стиля для зеленого фона
       @green_background = Spreadsheet::Format.new(color: :white, pattern: 1,
-                                                  pattern_fg_color: :green,
-                                                  border: :thin)
+                                                  pattern_fg_color: :gray,
+                                                  border: :thin,
+                                                  text_wrap: true,
+                                                  bold: true)
       # Создание стиля с границей
-      @border_style = Spreadsheet::Format.new(border: :thin, color: :black)
+      @border_style = Spreadsheet::Format.new(border: :thin, color: :black, text_wrap: true)
       # Создание стиля с границей
-      @border_style_with_right_align = Spreadsheet::Format.new(border: :thin, color: :black, horizontal_align: :right)
+      @border_style_with_right_align = Spreadsheet::Format.new(border: :thin, color: :black,
+                                                               text_wrap: true, horizontal_align: :right)
 
       settings_price = set_price_sheet_attributes(@hash_value) # хеш настроек для создания листов прайса
 
@@ -138,7 +142,6 @@ module CreateFileXlsMethods
         end
       end
 
-
       #==============================================
 
       # Заполнение таблицы данными
@@ -160,7 +163,6 @@ module CreateFileXlsMethods
         max_length = xls_sheet.column(col_index).map(&:length).max
         xls_sheet.column(col_index).width = [max_length + 2, 50].min
       end
-
 
     end
 
@@ -315,7 +317,7 @@ module CreateFileXlsMethods
     end
 
     #================= Данные для теста =====================================
-     def set_test_data_partner
+    def set_test_data_partner
 
       podrazdelenie = ["Одесса ОСПП", "Тендерный отдел",
                        "Ровно ОСПП", "Львов ОСПП", "Кривой Рог ОСПП",
