@@ -113,7 +113,7 @@ module CreateFileXlsMethods
     end
 
     def creat_sheet_xls(el_hash)
-
+      # Установить параметры для построения прайса
       set_sheet_params_new(el_hash)
 
       # Получить хеш с для построения запроса
@@ -138,6 +138,9 @@ module CreateFileXlsMethods
         end
       end
 
+
+      #==============================================
+
       # Заполнение таблицы данными
       grouped_results.each_with_index do |leftover, index|
         row_values = column_names.map { |column| format_value(leftover.send(column)) }
@@ -145,19 +148,25 @@ module CreateFileXlsMethods
 
         # Применение стиля с границей к каждой ячейке в строках с данными
         row_values.each_with_index do |cell_value, col_index|
-          # xls_sheet.row(index + 1).set_format(col_index, @border_style)
-
           format = contains_only_digits_spaces_dots_and_commas?(cell_value) ? @border_style_with_right_align : @border_style
-          # format = cell_value.is_a?(String) ?  @border_style :  @border_style_with_right_align
           xls_sheet.row(index + 1).set_format(col_index, format)
         end
       end
+
+      #==============================================
+      # Определение максимальной длины данных в каждом столбце
+      # Проходим в цикле по всем столбцам и применяем автоподбор ширины
+      xls_sheet.column_count.times do |col_index|
+        max_length = xls_sheet.column(col_index).map(&:length).max
+        xls_sheet.column(col_index).width = [max_length + 2, 50].min
+      end
+
 
     end
 
     def contains_only_digits_spaces_dots_and_commas?(str)
       # Проверяем, что строка состоит только из цифр, пробелов, точек и запятых
-      return str.match?(/\A[\d\s.,]+\z/)
+      return str.match?(/\A(?:\d+(?:[.,]\d*)?|\>\d+)\z/)
     end
 
     def hash_value_keys_partner(tk_ilsh, tk_cmk, tk_shop, skl_pdrzd)
@@ -293,6 +302,7 @@ module CreateFileXlsMethods
 
     def format_value(value)
       if value.is_a?(Numeric)
+        value = ">#{@max_count}" if value.to_i == @max_count
         format_number_with_thousands(value)
       else
         value
@@ -324,6 +334,7 @@ module CreateFileXlsMethods
                "test@tot.biz.ua", "test1@tot.biz.ua",
                "test2@tot.biz.ua", "test3@tot.biz.ua", "test4@tot.biz.ua"]
 
+      email = ["svv2602@invelta.com.ua"]
 
       10.times do |i|
         Partner.create!(

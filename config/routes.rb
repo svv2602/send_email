@@ -5,5 +5,6 @@ Rails.application.routes.draw do
   get 'report', to: 'api#report'
   get 'import_attr', to: 'api#import_attr'
   get 'import_data', to: 'api#import_data'
+  get 'export_to_excel', to: 'export#export_to_excel'
   root 'readme#show'
 end
