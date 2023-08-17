@@ -97,7 +97,7 @@ module CreateFileXlsMethods
 
       # Создание стиля для зеленого фона
       @green_background = Spreadsheet::Format.new(color: :black, pattern: 1,
-                                                  pattern_fg_color: :aqua,
+                                                  pattern_fg_color: :cyan,
                                                   border: :thin,
                                                   text_wrap: true,
                                                   bold: true,
@@ -350,7 +350,6 @@ module CreateFileXlsMethods
                "test@tot.biz.ua", "test1@tot.biz.ua",
                "test2@tot.biz.ua", "test3@tot.biz.ua", "test4@tot.biz.ua"]
 
-      email = ["svv2602@invelta.com.ua"]
 
       10.times do |i|
         Partner.create!(
