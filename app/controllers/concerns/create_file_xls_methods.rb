@@ -90,16 +90,26 @@ module CreateFileXlsMethods
       # Создание объекта для XLS-файла
       @xls_file = Spreadsheet::Workbook.new
 
+      # полный список стандартных имен цветов, поддерживаемых в библиотеке spreadsheet
+      #   [:black, :white, :red, :green, :blue, :yellow, :purple, :orange, :pink,
+      #    :gray, :brown, :cyan, :magenta, :silver, :lime, :maroon, :olive, :navy,
+      #    :teal, :fuchsia, :aqua]
+
       # Создание стиля для зеленого фона
-      @green_background = Spreadsheet::Format.new(color: :white, pattern: 1,
-                                                  pattern_fg_color: :gray,
+      @green_background = Spreadsheet::Format.new(color: :black, pattern: 1,
+                                                  pattern_fg_color: :aqua,
                                                   border: :thin,
                                                   text_wrap: true,
-                                                  bold: true)
+                                                  bold: true,
+                                                  weight: :bold, # Установка жирного шрифта
+                                                  size: 12,      # Установка размера шрифта
+                                                  vertical_align: :top, # Установка вертикального выравнивания
+                                                  horizontal_align: :center # Установка горизонтального выравнивания
+                                                  )
       # Создание стиля с границей
-      @border_style = Spreadsheet::Format.new(border: :thin, color: :black, text_wrap: true)
+      @border_style = Spreadsheet::Format.new(border: :thin, color: :black, size: 10, text_wrap: true)
       # Создание стиля с границей
-      @border_style_with_right_align = Spreadsheet::Format.new(border: :thin, color: :black,
+      @border_style_with_right_align = Spreadsheet::Format.new(border: :thin, color: :black, size: 10,
                                                                text_wrap: true, horizontal_align: :right)
 
       settings_price = set_price_sheet_attributes(@hash_value) # хеш настроек для создания листов прайса
@@ -141,6 +151,9 @@ module CreateFileXlsMethods
           xls_sheet.row(0).set_format(col_index, @green_background)
         end
       end
+      # Установка высоты строки
+        xls_sheet.row(0).height = 30
+
 
       #==============================================
 
