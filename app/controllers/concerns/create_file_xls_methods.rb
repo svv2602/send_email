@@ -31,11 +31,6 @@ module CreateFileXlsMethods
       arr.uniq.reject { |value| value.empty? }
     end
 
-    def alias_checking
-
-    end
-
-
     def find_value_product(product_el)
       normalized_key = product_el.gsub(" ", "").downcase
       hash_product = db_columns[:Product]
@@ -48,6 +43,8 @@ module CreateFileXlsMethods
     end
 
     def set_test_data
+      # очистка таблиц отправки почты и партнеров с заливкой тестовых данных
+      # для проверки рассылки
       Email.delete_all
       Partner.delete_all
       set_test_data_partner
@@ -337,7 +334,7 @@ module CreateFileXlsMethods
 
     #================= Данные для теста =====================================
     def set_test_data_partner
-
+      # формирование тестового набора данных в таблице partners в рабочей базе
       podrazdelenie = ["Одесса ОСПП", "Тендерный отдел",
                        "Ровно ОСПП", "Львов ОСПП", "Кривой Рог ОСПП",
                        "", "Тернополь ОСПП"]

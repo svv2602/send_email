@@ -4,11 +4,13 @@ module DataAccessMethods
 
   included do
     def bracket_replacement
+      # удаление скобок - вызывают ошибку в запросах SQL (или заменить на экранирование)
       ActiveRecord::Base.connection.execute("UPDATE leftovers SET Sklad = REPLACE(Sklad, '(', '') WHERE Sklad LIKE '%(%'")
       ActiveRecord::Base.connection.execute("UPDATE leftovers SET Sklad = REPLACE(Sklad, ')', '') WHERE Sklad LIKE '%)%'")
     end
 
     def type_replacement
+      # очистка типа партнеров, у которых отсутствует основной менеджер
       ActiveRecord::Base.connection.execute("UPDATE partners SET TipKontragentaILSh = '' WHERE OsnovnoiMeneger LIKE ''")
       ActiveRecord::Base.connection.execute("UPDATE partners SET TipKontragentaCMK = '' WHERE OsnovnoiMeneger LIKE ''")
       ActiveRecord::Base.connection.execute("UPDATE partners SET TipKontragentaSHOP = '' WHERE OsnovnoiMeneger LIKE ''")
