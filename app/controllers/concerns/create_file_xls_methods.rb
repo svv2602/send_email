@@ -31,6 +31,11 @@ module CreateFileXlsMethods
       arr.uniq.reject { |value| value.empty? }
     end
 
+    def alias_checking
+
+    end
+
+
     def find_value_product(product_el)
       normalized_key = product_el.gsub(" ", "").downcase
       hash_product = db_columns[:Product]
@@ -208,7 +213,8 @@ module CreateFileXlsMethods
         found_alias = nil
 
         arr_aliases.each do |alias_hash|
-          if alias_hash["Объект"] == name_column
+          normalized_key = alias_hash["Объект"].gsub(" ", "").downcase
+          if normalized_key == name_column.gsub(" ", "").downcase
             found_alias = alias_hash["Алиас"]
             break
           end
@@ -349,7 +355,6 @@ module CreateFileXlsMethods
       email = ["postmaster@tot.biz.ua", "prokoleso_logs@tot.biz.ua",
                "test@tot.biz.ua", "test1@tot.biz.ua",
                "test2@tot.biz.ua", "test3@tot.biz.ua", "test4@tot.biz.ua"]
-
 
       10.times do |i|
         Partner.create!(
