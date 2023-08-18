@@ -21,7 +21,7 @@ class ExportController < ApplicationController
         sheet.row(index + 1).replace(row_data)
       end
 
-      file_path = Rails.root.join('public', "#{@tab_class.to_s.downcase}.xls")
+      file_path = Rails.root.join('tmp', "#{@tab_class.to_s.downcase}.xls")
       book.write(file_path)
 
       send_file file_path, type: 'application/xls', disposition: 'attachment'
