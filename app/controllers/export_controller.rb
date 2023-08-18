@@ -1,24 +1,39 @@
 require 'spreadsheet'
 
 class ExportController < ApplicationController
+  before_action :set_tab_class, only: :export_to_excel
+
   def export_to_excel
-    book = Spreadsheet::Workbook.new
-    sheet = book.create_worksheet(name: 'Sheet1')
+    puts "@tab_class = #{@tab_class}"
+    if @tab_class.present?
 
-    # Получите названия столбцов из модели
-    column_names = Product.column_names
-    sheet.row(0).concat(column_names)
+      book = Spreadsheet::Workbook.new
+      sheet = book.create_worksheet(name: 'Sheet1')
 
-    data = Product.all
+      # Получите названия столбцов из модели
+      column_names = @tab_class.column_names
+      sheet.row(0).concat(column_names)
 
-    data.each_with_index do |record, index|
-      row_data = column_names.map { |column| record[column] }
-      sheet.row(index + 1).replace(row_data)
+      data = @tab_class.all
+
+      data.each_with_index do |record, index|
+        row_data = column_names.map { |column| record[column] }
+        sheet.row(index + 1).replace(row_data)
+      end
+
+      file_path = Rails.root.join('public', "#{@tab_class.to_s.downcase}.xls")
+      book.write(file_path)
+
+      send_file file_path, type: 'application/xls', disposition: 'attachment'
+    else
+      render plain: "Таблицы не существует \n#{Time.now}"
     end
-
-    file_path = Rails.root.join('public', 'data.xlsx')
-    book.write(file_path)
-
-    send_file file_path, type: 'application/xlsx', disposition: 'attachment'
   end
+
+  def set_tab_class
+    table_name = params[:table] # Получаем имя таблицы из параметров запроса
+    ActiveRecord::Base.connection.table_exists?(table_name) ? @tab_class = table_name.capitalize.singularize.constantize : @tab_class = nil
+  end
+
+
 end
