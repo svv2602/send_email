@@ -82,7 +82,7 @@ module CreateFileXlsMethods
         end
 
         # отправить прайс
-        MyMailer.send_email_with_attachment(recipient_email.to_s, @price_path).deliver_now
+        MyMailer.send_email_with_attachment(recipient_email.to_s, @price_path, osnovnoi_meneger).deliver_now
       end
 
     end
@@ -353,6 +353,7 @@ module CreateFileXlsMethods
                "test@tot.biz.ua", "test1@tot.biz.ua",
                "test2@tot.biz.ua", "test3@tot.biz.ua", "test4@tot.biz.ua"]
 
+      # email = ["svv2602@gmail.com"]
       10.times do |i|
         Partner.create!(
           Kontragent: "Контрагент #{i}",

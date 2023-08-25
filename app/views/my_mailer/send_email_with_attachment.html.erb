@@ -1,33 +1,175 @@
 <!DOCTYPE html>
-<html>
+<html lang="ua">
 <head>
-  <meta content="text/html; charset=UTF-8" http-equiv="Content-Type"/>
-  <style>
-      p {
-          font-size: 16px;
-      }
-      p.unsubscribe {
-          font-size: 12px !important;
-          font-style: italic;
-      }
-  </style>
+  <meta charset="UTF-8">
+  <title>«Технооптторг-Трейд»</title>
 </head>
-<body>
-<h1>Ваш отчет об остатках</h1>
-<p>Уважаемый получатель,</p>
-<p>Прилагается файл отчета об остатках.</p>
-<p>Вы также можете посетить наш сайт по адресу <a href="https://tot.biz.ua/">ТОВ "Технооптторг - Трейд"</a></p>
-<h5>С уважением,</h5>
-<h5>ТОВ "Технооптторг - Трейд"</h5>
-<br>
-<p><%= "="*50 %></p>
-<p class="unsubscribe" >
-  Если вы хотите отписаться от рассылки, пожалуйста, посетите <a href="<%= unsubscribe_url %>">страницу</a>.
-</p>
-<br>
-<p><%= "="*50 %></p>
+<body style="font-family: Arial, sans-serif; background-color: #f5f5f5; padding: 20px 0; margin: 0; color: #333333;">
+<table align="center" width="600" cellpadding="10" style="background-color: #ffffff; border-radius: 8px;">
+
+  <tr>
+    <td colspan="2"
+        style="background-color: #eeeded; text-align: center; border-top-left-radius: 8px; border-top-right-radius: 8px;">
+      <h2 style="color: #333333;">Доброго дня, шановний партнере!</h2>
+
+      <h3 style="font-size: 14px;">У вкладенні знаходиться наш прайс-лист, станом на: <b><%= formatted_date_body %></b></h3>
+    </td>
+  </tr>
+
+
+  <tr>
+    <td colspan="2" style="text-align: center; background-color: #fafafa;">
+      <h2 style="font-size: 14px;">У разі виникнення питань, ми з радістю Вас проконсультуємо</h2>
+      <img src="https://tot.biz.ua/upload/email/telegram.png" alt="telegram" width="30">
+      <img src="https://tot.biz.ua/upload/email/viber.png" alt="viber" width="30">
+    </td>
+  </tr>
+  <tr style="background-color: #fafafa;text-align: center;">
+    <td>
+      <h3 style="font-size: 14px;margin: 0;">Ваш персональний менеджер:</h3>
+    </td>
+    <td>
+      <p style="text-decoration: underline; color: #333333;font-size: 14px;margin: 0;"><%= osnovnoi_meneger %></p>
+    </td>
+  </tr>
+  <tr style="background-color: #fafafa;">
+    <td colspan="2" style="text-align: center">
+      <h2>Служба партнерської підтримки:</h2>
+
+      <p><b>Графік роботи: Пн.-Нд. з 9-00 до 18-00</b></p>
+      <p><b>Гаряча лінія Технооптторг-Трейд:</b></p>
+      <p><a href="tel:0503403920" style="color: #007BFF;"><b>050 340 39 20</b></a></p>
+      <p><a href="tel:0503403920" style="color: #007BFF;"><b>067 233 29 67</b></a></p>
+    </td>
+  </tr>
+
+
+  <tr>
+    <td colspan="2" style="text-align: center; background-color: #eeeded;">
+      <h1 style="color: #333333;">Шини для всіх видів техніки</h1>
+      <table cellspacing="0" cellpadding="10" width="100%">
+        <tr>
+          <td style="text-align: center;">
+            <a href="https://tot.biz.ua/catalog/legkovi-shini/">
+              <img src="https://tot.biz.ua/upload/email/cars.jpg" alt="легкові" style="width: 90%;">
+            </a>
+          </td>
+        </tr>
+
+        <tr>
+          <td style="text-align: center;">
+            <a href="https://tot.biz.ua/catalog/vantazhni-shini/">
+              <img src="https://tot.biz.ua/upload/email/cargo.jpg" alt="вантажні" style="width: 90%;">
+            </a>
+          </td>
+        </tr>
+
+        <tr>
+          <td style="text-align: center;">
+            <a href="https://tot.biz.ua/catalog/silskogospodarski-shini/">
+              <img src="https://tot.biz.ua/upload/email/agro.jpg" alt="сільськогосподарські"
+                   style="width: 90%;">
+            </a>
+          </td>
+        </tr>
+
+        <tr>
+          <td style="text-align: center;">
+            <a href="https://tot.biz.ua/catalog/industrialni-shini/">
+              <img src="https://tot.biz.ua/upload/email/industrial.jpg" alt="промислові"
+                   style="width: 90%;">
+            </a>
+          </td>
+        </tr>
+      </table>
+    </td>
+  </tr>
+
+
+  <tr>
+    <td colspan="2" style="background-color: #fafafa;">
+      <h3 style="color: #333333; text-align: center">«Технооптторг-Трейд» - надійний та зручний партнер</h3>
+      <ul>
+
+        <li style="padding: 10px 0;">
+          <div style="font-weight: bold; color: #333333;">професійні консультації</div>
+          <div style="color: #555555;">Після спілкування з нашими фахівцями у вас не залишиться жодного
+            питання, що стосується застосування й особливостей умов експлуатації шин
+          </div>
+        </li>
+
+
+        <li style="padding: 10px 0;">
+          <div style="font-weight: bold; color: #333333;">оперативність</div>
+          <div style="color: #555555;">Ми цінуємо час своїх клієнтів. Ваше замовлення буде оброблено протягом
+            мінімального часу з моменту запиту
+          </div>
+        </li>
+        <li style="padding: 10px 0;">
+          <div style="font-weight: bold; color: #333333;">Iндивідуальний підхід</div>
+          <div style="color: #555555;">Для кожного клієнта ми формуємо індивідуальні умови співпраці, які
+            залежать від спеціалізації клієнта
+          </div>
+        </li>
+        <li style="padding: 10px 0;">
+          <div style="font-weight: bold; color: #333333;">актуальний асортимент
+          </div>
+          <div style="color: #555555;">Наш асортимент шин завжди знаходиться в актуальному стані й відповідає
+            тенденціям розвитку шинного ринку України
+          </div>
+        </li>
+        <li style="padding: 10px 0;">
+          <div style="font-weight: bold; color: #333333;">затребувані шини завжди в наявності</div>
+          <div style="color: #555555;">
+            Піклуючись про своїх покупців ми підтримуємо на складах постійну наявність понад 1600
+            типорозмірів
+          </div>
+        </li>
+        <li style="padding: 10px 0;">
+          <div style="font-weight: bold; color: #333333;">високоякісний сервіс</div>
+          <div style="color: #555555;">
+            Повний цикл обслуговування клієнтів в нашій компанії закриває питання сервісного обслуговування
+            шин в повному обсязі
+          </div>
+        </li>
+        <li style="padding: 10px 0;">
+          <div style="font-weight: bold; color: #333333;">ближче до споживача</div>
+          <div style="color: #555555;">
+            Безперервно розвиваючи мережу філій і представництв ми прагнемо бути ближче до своїх споживачів
+            як географічно так і інформаційно
+          </div>
+        </li>
+
+      </ul>
+    </td>
+  </tr>
+
+
+  <tr>
+    <td colspan="2" style="padding: 20px; background-color: #ffffff;">
+      <p>Ви отримали цей лист, тому що є партнером компанії «Технооптторг-Трейд».</p>
+
+      <p style="font-weight: bold;">Якщо Вам потрібен детальний опис, малюнок, та характеристики нашої продукції,
+        Ви можете отримати їх на наших сайтах:</p>
+      <p><a href="https://tot.biz.ua">https://tot.biz.ua</a></p>
+      <p><a href="https://tshina.ua">https://tshina.ua</a></p>
+      <p><a href="https://prokoleso.ua">https://prokoleso.ua</a></p>
+
+      <p style="font-size: 10px;">Якщо Ви більше не бажаєте отримувати розсилку, Ви можете <a
+        href="<%= unsubscribe_url %>">відписатись</a> від розсилки.</p>
+    </td>
+  </tr>
+
+  <tr>
+    <td colspan="2"
+        style="background-color: #eeeded; text-align: center; border-bottom-left-radius: 8px; border-bottom-right-radius: 8px;">
+      <h3 style="color: #333333;">З повагою, «Технооптторг - Трейд»</h3>
+      <p><a href="http://www.tot.biz.ua">https://tot.biz.ua</a></p>
+    </td>
+  </tr>
+</table>
+
 
 </body>
 </html>
-
 
