@@ -5,6 +5,7 @@ module CreateFileXlsMethods
     def set_sheet_params_new(el_hash)
       @sheet_name = el_hash[:sheet_name]
       @skl = el_hash[:skl].uniq.reject { |value| value.empty? }
+      @city = el_hash[:city].uniq.reject { |value| value.empty? }
       @grup = el_hash[:grup].uniq.reject { |value| value.empty? }
       @podrazdel = el_hash[:podrazdel].uniq.reject { |value| value.empty? }
       @price = el_hash[:price].uniq.reject { |value| value.empty? }
@@ -74,7 +75,8 @@ module CreateFileXlsMethods
           @hash_value = hash_value_keys_partner(row["TipKontragentaILSh"],
                                                 row["TipKontragentaCMK"],
                                                 row["TipKontragentaSHOP"],
-                                                row["Podrazdelenie"])
+                                                row["Podrazdelenie"],
+                                                row["Gorod"])
 
           set_price_sheet_attributes(@hash_value) # хеш настроек для создания листов прайса
           create_book_xls
@@ -104,10 +106,10 @@ module CreateFileXlsMethods
                                                   text_wrap: true,
                                                   bold: true,
                                                   weight: :bold, # Установка жирного шрифта
-                                                  size: 12,      # Установка размера шрифта
+                                                  size: 12, # Установка размера шрифта
                                                   vertical_align: :top, # Установка вертикального выравнивания
                                                   horizontal_align: :center # Установка горизонтального выравнивания
-                                                  )
+      )
       # Создание стиля с границей
       @border_style = Spreadsheet::Format.new(border: :thin, color: :black, size: 10, text_wrap: true)
       # Создание стиля с границей
@@ -133,7 +135,7 @@ module CreateFileXlsMethods
       set_sheet_params_new(el_hash)
 
       # Получить хеш с для построения запроса
-      hash_with_params_sklad = hash_query_params_all(@skl, @grup, @podrazdel, @price, @product, @max_count, @sheet_select)
+      hash_with_params_sklad = hash_query_params_all(@skl, @city,@grup, @podrazdel, @price, @product, @max_count, @sheet_select)
       results = build_leftovers_combined_query(hash_with_params_sklad)
 
       grouped_results = results.group(:artikul, :Tovar_Kategoriya)
@@ -154,8 +156,7 @@ module CreateFileXlsMethods
         end
       end
       # Установка высоты строки
-        xls_sheet.row(0).height = 30
-
+      xls_sheet.row(0).height = 30
 
       #==============================================
 
@@ -187,11 +188,12 @@ module CreateFileXlsMethods
       return str.match?(/\A(?:\d+(?:[.,]\d*)?|\>\d+|[\d\s.,]+)\z/)
     end
 
-    def hash_value_keys_partner(tk_ilsh, tk_cmk, tk_shop, skl_pdrzd)
+    def hash_value_keys_partner(tk_ilsh, tk_cmk, tk_shop, skl_pdrzd, skl_gorod)
       { TipKontragentaILSh: tk_ilsh,
         TipKontragentaCMK: tk_cmk,
         TipKontragentaSHOP: tk_shop,
-        Podrazdelenie: skl_pdrzd
+        Podrazdelenie: skl_pdrzd,
+        Gorod: skl_gorod
       }
     end
 
@@ -240,6 +242,7 @@ module CreateFileXlsMethods
         hash_settings.each do |key, value|
           sheet_name = ""
           skl = []
+          city = []
           grup = []
           podrazdel = []
           price = []
@@ -295,10 +298,23 @@ module CreateFileXlsMethods
           # ====================================================
           # Определение дополнительного склада для подразделения
           # ====================================================
-          podrazdel << hash_value[:Podrazdelenie]
+          # podrazdel << hash_value[:Podrazdelenie] # если использовать подразделение менеджера
+          city << hash_value[:Gorod] # если использовать город менеджера
 
+          # ====================================================
+          # Определение списка складов для подразделения
+          # ====================================================
           value["settings"]["Склады"].each do |el|
-            el["ЭтоГруппа"] == "Да" ? grup << el["Склад"] : skl << el["Склад"]
+
+            case el["ЭтоГруппа"].downcase
+            when "да"
+              grup << el["Склад"]
+            when "нет"
+              skl << el["Склад"]
+            when "city"
+              city << el["Склад"]
+            end
+
           end
 
           list[key] = { sheet_name: sheet_name,
@@ -308,14 +324,15 @@ module CreateFileXlsMethods
                         sheet_select_product: sheet_select_product,
                         grup: grup,
                         skl: skl,
+                        city: city,
                         max_count: max_count
           }
-          # puts list
+
         end
       else
         puts "Нет настроек для прайс-листа"
       end
-
+      puts "DEBUG  list = #{list}"
       list
     end
 
@@ -349,11 +366,14 @@ module CreateFileXlsMethods
               "Интернет-магазин",
               "УкрОборонПром"]
 
+      city = ["Київ"]
+
       email = ["postmaster@tot.biz.ua", "prokoleso_logs@tot.biz.ua",
                "test@tot.biz.ua", "test1@tot.biz.ua",
                "test2@tot.biz.ua", "test3@tot.biz.ua", "test4@tot.biz.ua"]
 
-      # email = ["svv2602@gmail.com"]
+      email = ["svv2602@gmail.com"]
+
       10.times do |i|
         Partner.create!(
           Kontragent: "Контрагент #{i}",
@@ -361,7 +381,7 @@ module CreateFileXlsMethods
           Partner: "Партнер #{i}",
           OsnovnoiMeneger: "Менеджер #{i}",
           TelefonPodrazdeleniia: "123-456-789",
-          Gorod: "Город #{i}",
+          Gorod: city[rand(city.size)],
           TipKontragentaILSh: type[rand(type.size)],
           TipKontragentaCMK: type[rand(type.size)],
           TipKontragentaSHOP: type[rand(type.size)],

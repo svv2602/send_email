@@ -2,7 +2,7 @@ module ResponseAggregatorMethods
   extend ActiveSupport::Concern
 
   included do
-    def hash_query_params_all(skl, grup, podrazdel, price, product, max_count, sheet_select)
+    def hash_query_params_all(skl, city, grup, podrazdel, price, product, max_count, sheet_select)
       array_query1_where = []
       array_query2_where = []
       array_query1_select = []
@@ -11,7 +11,7 @@ module ResponseAggregatorMethods
       array_name_sum = []
 
       # обработка списка складов
-      hash = { Sklad: skl, GruppaSkladov: grup, Podrazdelenie: podrazdel }
+      hash = { Gorod: city, Sklad: skl, GruppaSkladov: grup, Podrazdelenie: podrazdel }
       hash.each do |key, value|
         strSQL = "Leftovers.#{key.to_s}"
 
@@ -81,8 +81,6 @@ module ResponseAggregatorMethods
         end
       end
 
-
-
       hash_result = {
         array_query1_where: str_array_query1_where.gsub("() AND ", ""),
         array_query2_where: str_array_query2_where.gsub("() AND ", ""),
@@ -129,10 +127,9 @@ module ResponseAggregatorMethods
         attr_query << "SUM(Field_#{i}) as `#{el}`"
       end
 
-      { attr_query_name_collumn: attr_query_name_collumn, attr_query: attr_query }  # Возвращаем хеш напрямую
+      { attr_query_name_collumn: attr_query_name_collumn, attr_query: attr_query } # Возвращаем хеш напрямую
 
     end
-
 
   end
 
