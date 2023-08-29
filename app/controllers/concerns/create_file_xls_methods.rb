@@ -366,13 +366,15 @@ module CreateFileXlsMethods
               "Интернет-магазин",
               "УкрОборонПром"]
 
-      city = ["Київ"]
+      city = ["Київ","Запоріжжя", "Миколаїв",
+              "Дніпро", "Тернопіль", "Суми",
+              "Кривий Ріг", "Харків", "Вінниця", "Львів"]
 
       email = ["postmaster@tot.biz.ua", "prokoleso_logs@tot.biz.ua",
                "test@tot.biz.ua", "test1@tot.biz.ua",
                "test2@tot.biz.ua", "test3@tot.biz.ua", "test4@tot.biz.ua"]
 
-      email = ["svv2602@gmail.com"]
+      email = ["svv2602@gmail.com", "snisar.vv@tot.biz.ua"]
 
       10.times do |i|
         Partner.create!(
