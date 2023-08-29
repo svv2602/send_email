@@ -67,7 +67,6 @@ module CreateFileXlsMethods
       # сделать хеш дополнительных цен для email
       hash_dop_email = set_dopemail
 
-
       # Обработка результатов
       results.each do |row|
         osnovnoi_meneger = row["OsnovnoiMeneger"]
@@ -109,7 +108,7 @@ module CreateFileXlsMethods
         end
 
         # отправить прайс
-        file_path_to_send = hash_dop_email.include?(recipient_email)? @price_ind_path : @price_path
+        file_path_to_send = hash_dop_email.include?(recipient_email) ? @price_ind_path : @price_path
         MyMailer.send_email_with_attachment(recipient_email.to_s, file_path_to_send, osnovnoi_meneger).deliver_now
 
       end
@@ -122,9 +121,9 @@ module CreateFileXlsMethods
       @xls_file = Spreadsheet::Workbook.new
 
       # полный список стандартных имен цветов, поддерживаемых в библиотеке spreadsheet
-      #   [:black, :white, :red, :green, :blue, :yellow, :purple, :orange, :pink,
-      #    :gray, :brown, :cyan, :magenta, :silver, :lime, :maroon, :olive, :navy,
-      #    :teal, :fuchsia, :aqua]
+      #   [:black, :white, :red, :green, :blue, :yellow, :purple, :orange,
+      #    :gray, :brown, :cyan, :magenta, :silver, :lime,   :navy,
+      #     :fuchsia, :aqua]
 
       # Создание стиля для зеленого фона
       @green_background = Spreadsheet::Format.new(color: :black, pattern: 1,
@@ -169,33 +168,36 @@ module CreateFileXlsMethods
                                .select(hash_grouped_name_collumns(hash_with_params_sklad)[:attr_query])
 
       xls_sheet = @xls_file.create_worksheet(name: @sheet_name)
+
+      correction_index = 0
+
       # Добавление заголовков в таблицу XLS
       column_names = hash_grouped_name_collumns(hash_with_params_sklad)[:attr_query_name_collumn]
 
       # Формирование заголовков с alias
       new_column_names = column_names.map { |element| find_value_product(element) }
-      xls_sheet.row(0).concat set_alias(new_column_names)
+      xls_sheet.row(correction_index).concat set_alias(new_column_names)
 
       # Применение стиля к каждой ячейке заголовков, если она содержит значение
       new_column_names.each_with_index do |value, col_index|
         if value.present?
-          xls_sheet.row(0).set_format(col_index, @green_background)
+          xls_sheet.row(correction_index).set_format(col_index, @green_background)
         end
       end
       # Установка высоты строки
-      xls_sheet.row(0).height = 30
-
+      xls_sheet.row(correction_index).height = 30
+      correction_index += 1
       #==============================================
 
       # Заполнение таблицы данными
       grouped_results.each_with_index do |leftover, index|
         row_values = column_names.map { |column| format_value(leftover.send(column)) }
-        xls_sheet.row(index + 1).push(*row_values)
+        xls_sheet.row(index + correction_index).push(*row_values)
 
         # Применение стиля с границей к каждой ячейке в строках с данными
         row_values.each_with_index do |cell_value, col_index|
           format = contains_only_digits_spaces_dots_and_commas?(cell_value) ? @border_style_with_right_align : @border_style
-          xls_sheet.row(index + 1).set_format(col_index, format)
+          xls_sheet.row(index + correction_index).set_format(col_index, format)
         end
       end
 
@@ -207,6 +209,50 @@ module CreateFileXlsMethods
         xls_sheet.column(col_index).width = [max_length + 2, 50].min
       end
 
+      correction_index = 0
+      create_head_sheet(xls_sheet, correction_index, column_names.size)
+
+    end
+
+    def create_head_sheet(xls_sheet, correction_index, column_count)
+      json_string = File.read(@file_price_textshapka_path)
+      arr_attr = JSON.parse(json_string).to_a
+      row_begin = correction_index
+
+      arr_attr.each do |el|
+        unless el["text"].nil?
+          # Создание стиля
+          size_value = el["size"].to_i
+          size_value = 12 unless (10..24).include?(size_value)
+          current_style = Spreadsheet::Format.new(color: el["colorfont"]&.to_sym || :black,
+                                                  pattern: 1,
+                                                  pattern_fg_color: el["colorbackground"]&.to_sym || :white,
+                                                  bold: el["bold"]&.downcase == "да" || false,
+                                                  italic: el["italic"]&.downcase == "да" || false,
+                                                  size: size_value,
+                                                  text_wrap: true,
+                                                  horizontal_align: :center, # Установка горизонтального выравнивания
+                                                  vertical_align: :center # Установка вертикального выравнивания
+          )
+
+          xls_sheet.insert_row(correction_index)
+          # Применение стиля к каждой ячейке заголовков, если она содержит значение
+          column_count.times do |column|
+            xls_sheet[correction_index, column] = 1
+            xls_sheet.row(correction_index).set_format(column, current_style)
+          end
+
+          xls_sheet.merge_cells(correction_index, 0, correction_index, column_count - 1)
+          xls_sheet[correction_index, 0] = el["text"]
+          # Установка высоты строки
+          xls_sheet.row(correction_index).height = 30
+
+          correction_index += 1
+
+        end
+      end
+      # добавить строку разрыва между заголовком и таблицей
+      xls_sheet.insert_row(correction_index) if row_begin < correction_index
     end
 
     def contains_only_digits_spaces_dots_and_commas?(str)
@@ -347,7 +393,6 @@ module CreateFileXlsMethods
           # Добавить к списку цен индивидуальную колонку
           price << hash_value[:hash_email_price][sheet_name] if hash_value[:hash_email_price][sheet_name].present?
           price = price.flatten.uniq
-
 
           # ====================================================
           # Определение дополнительного склада для подразделения

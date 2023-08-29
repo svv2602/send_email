@@ -2,17 +2,27 @@
   {
     "number": 1,
     "text": "Скидка на зимние шины 3% от цены прайса",
-    "colorfont": "navy",
-    "colorbackground": "silver",
-    "bolt": "Нет",
-    "italic": "Нет"
+    "colorfont": "black",
+    "colorbackground": "white",
+    "bold": "Да",
+    "italic": "Нет",
+    "size": 16
   },
   {
     "number": 2,
-    "text": "Новый ассортимет летних шин Bridgestone",
-    "colorfont": "maroon",
-    "colorbackground": "fuchsia",
-    "bolt": "Да",
-    "italic": "Да"
+    "text": "Скидка плоплпоплплпо прайса",
+    "colorfont": "white",
+    "colorbackground": "black",
+    "bold": "Да",
+    "italic": "Да",
+    "size": 26
+  },
+  {
+    "number": 3,
+    "text": "ПРИВЕТ",
+    "colorfont": "black",
+    "bold": "НЕТ",
+    "size": 14
   }
+
 ]
