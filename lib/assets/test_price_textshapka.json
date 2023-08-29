@@ -2,27 +2,27 @@
   {
     "number": 1,
     "text": "Скидка на зимние шины 3% от цены прайса",
-    "colorfont": "black",
+    "colorfont": "порпаво",
     "colorbackground": "white",
     "bold": "Да",
     "italic": "Нет",
-    "size": 16
+    "size": 12
   },
   {
     "number": 2,
     "text": "Скидка плоплпоплплпо прайса",
-    "colorfont": "white",
-    "colorbackground": "black",
+    "colorfont": "whаЫАite",
+    "colorbackground": "ыААЫ",
     "bold": "Да",
     "italic": "Да",
-    "size": 26
+    "size": 12
   },
   {
     "number": 3,
     "text": "ПРИВЕТ",
     "colorfont": "black",
     "bold": "НЕТ",
-    "size": 14
+    "size": 12
   }
 
 ]

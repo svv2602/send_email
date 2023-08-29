@@ -122,7 +122,7 @@ module CreateFileXlsMethods
 
       # полный список стандартных имен цветов, поддерживаемых в библиотеке spreadsheet
       #   [:black, :white, :red, :green, :blue, :yellow, :purple, :orange,
-      #    :gray, :brown, :cyan, :magenta, :silver, :lime,   :navy,
+      #    :gray, :brown, :cyan, :magenta, :silver, :lime, :navy,
       #     :fuchsia, :aqua]
 
       # Создание стиля для зеленого фона
@@ -131,8 +131,6 @@ module CreateFileXlsMethods
                                                   border: :thin,
                                                   text_wrap: true,
                                                   bold: true,
-                                                  weight: :bold, # Установка жирного шрифта
-                                                  size: 12, # Установка размера шрифта
                                                   vertical_align: :top, # Установка вертикального выравнивания
                                                   horizontal_align: :center # Установка горизонтального выравнивания
       )
@@ -214,9 +212,31 @@ module CreateFileXlsMethods
 
     end
 
+    def norma_color(arr_attr)
+      # полный список стандартных имен цветов, поддерживаемых в библиотеке spreadsheet
+      arr_color = [:black, :white, :red, :green, :blue, :yellow, :purple, :orange,
+                   :gray, :brown, :cyan, :magenta, :silver, :lime, :navy, :fuchsia, :aqua]
+      new_arr = []
+      arr_attr.each do |el|
+        el_hash = {}
+        el.each do |key, value|
+          case key
+          when "colorbackground"
+            el_hash[key] = arr_color.include?(el["colorbackground"]&.to_sym) ? el["colorbackground"]&.to_sym : :white
+          when "colorfont"
+            el_hash[key] = arr_color.include?(el["colorfont"]&.to_sym) ? el["colorfont"]&.to_sym : :black
+          else
+            el_hash[key] = value
+          end
+        end
+        new_arr << el_hash
+      end
+      new_arr
+    end
+
     def create_head_sheet(xls_sheet, correction_index, column_count)
       json_string = File.read(@file_price_textshapka_path)
-      arr_attr = JSON.parse(json_string).to_a
+      arr_attr = norma_color(JSON.parse(json_string).to_a)
       row_begin = correction_index
 
       arr_attr.each do |el|
