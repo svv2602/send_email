@@ -71,7 +71,7 @@ module InputDataMethods
 
     def get_json_files_from_api
       # запись данных с настройками прайса
-      attr_path = ['settings', 'aliases']
+      attr_path = ['settings', 'aliases', 'dopemail', 'textshapka']
       directory_path = "#{Rails.root}/lib/assets"
       FileUtils.mkdir_p(directory_path) unless Dir.exist?(directory_path)
 
@@ -89,6 +89,11 @@ module InputDataMethods
         @msg_data_load ||= ""
         @msg_data_load += @msg_data_load_select
       end
+
+    end
+
+
+    def ert
 
     end
 

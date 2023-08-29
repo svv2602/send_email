@@ -1,0 +1,18 @@
+[
+  {
+    "number": 1,
+    "text": "Скидка на зимние шины 3% от цены прайса",
+    "colorfont": "navy",
+    "colorbackground": "silver",
+    "bolt": "Нет",
+    "italic": "Нет"
+  },
+  {
+    "number": 2,
+    "text": "Новый ассортимет летних шин Bridgestone",
+    "colorfont": "maroon",
+    "colorbackground": "fuchsia",
+    "bolt": "Да",
+    "italic": "Да"
+  }
+]

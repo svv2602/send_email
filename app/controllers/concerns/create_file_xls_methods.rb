@@ -135,7 +135,7 @@ module CreateFileXlsMethods
       set_sheet_params_new(el_hash)
 
       # Получить хеш с для построения запроса
-      hash_with_params_sklad = hash_query_params_all(@skl, @city,@grup, @podrazdel, @price, @product, @max_count, @sheet_select)
+      hash_with_params_sklad = hash_query_params_all(@skl, @city, @grup, @podrazdel, @price, @product, @max_count, @sheet_select)
       results = build_leftovers_combined_query(hash_with_params_sklad)
 
       grouped_results = results.group(:artikul, :Tovar_Kategoriya)
@@ -197,9 +197,30 @@ module CreateFileXlsMethods
       }
     end
 
-    def set_json_files_path(price_settings, price_aliases)
+    def set_json_files_path(price_settings, price_aliases, price_dopemail, price_textshapka)
       @file_price_settings_path = "#{Rails.root}/lib/assets/#{price_settings}.json"
       @file_price_aliases_path = "#{Rails.root}/lib/assets/#{price_aliases}.json"
+      @file_price_dopemail_path = "#{Rails.root}/lib/assets/#{price_dopemail}.json"
+      @file_price_textshapka_path = "#{Rails.root}/lib/assets/#{price_textshapka}.json"
+    end
+
+    def set_dopemail
+      @file_price_dopemail_path = "/home/user/RubymineProjects/myProject/send_email/lib/assets/test_price_dopemail.json"
+      json_string = File.read(@file_price_dopemail_path)
+      arr_dopemail = JSON.parse(json_string).to_a
+      result = {}
+      arr_dopemail.each do |element|
+        if element.key?("emails")
+          element["emails"].each do |el_arr|
+            if element.key?("list") && element.key?("price")
+              result[el_arr] ||= {}
+              result[el_arr][element["list"]] = element["price"]
+            end
+          end
+        end
+      end
+      result
+
     end
 
     def set_alias(arr_name_columns)
@@ -366,7 +387,7 @@ module CreateFileXlsMethods
               "Интернет-магазин",
               "УкрОборонПром"]
 
-      city = ["Київ","Запоріжжя", "Миколаїв",
+      city = ["Київ", "Запоріжжя", "Миколаїв",
               "Дніпро", "Тернопіль", "Суми",
               "Кривий Ріг", "Харків", "Вінниця", "Львів"]
 
