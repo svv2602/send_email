@@ -58,9 +58,15 @@ module CreateFileXlsMethods
 
       name_price = "price"
       @price_path = "#{directory_path}#{name_price}.xls"
+      name_price_ind = "price_ind"
+      @price_ind_path = "#{directory_path}#{name_price_ind}.xls"
 
       results = list_partners_to_send_email # получить список клиентов не получивших почту сегодня
       params = nil
+
+      # сделать хеш дополнительных цен для email
+      hash_dop_email = set_dopemail
+
 
       # Обработка результатов
       results.each do |row|
@@ -76,20 +82,41 @@ module CreateFileXlsMethods
                                                 row["TipKontragentaCMK"],
                                                 row["TipKontragentaSHOP"],
                                                 row["Podrazdelenie"],
-                                                row["Gorod"])
+                                                row["Gorod"],
+                                                {})
 
           set_price_sheet_attributes(@hash_value) # хеш настроек для создания листов прайса
-          create_book_xls
+          create_book_xls(@price_path)
           params = row["params"]
         end
 
+        # ===================================================================
+        # Создать индивидуальный прайс для email, если он есть в доп настройках
+        if hash_dop_email.include?(recipient_email)
+          # удалить старый прайс
+          File.delete(@price_ind_path) if File.exist?(@price_ind_path)
+          recipient_email_price = hash_dop_email[recipient_email]
+          # создать новый индивидуальный прайс
+          @hash_value = hash_value_keys_partner(row["TipKontragentaILSh"],
+                                                row["TipKontragentaCMK"],
+                                                row["TipKontragentaSHOP"],
+                                                row["Podrazdelenie"],
+                                                row["Gorod"],
+                                                recipient_email_price)
+
+          set_price_sheet_attributes(@hash_value) # хеш настроек для создания листов прайса
+          create_book_xls(@price_ind_path)
+        end
+
         # отправить прайс
-        MyMailer.send_email_with_attachment(recipient_email.to_s, @price_path, osnovnoi_meneger).deliver_now
+        file_path_to_send = hash_dop_email.include?(recipient_email)? @price_ind_path : @price_path
+        MyMailer.send_email_with_attachment(recipient_email.to_s, file_path_to_send, osnovnoi_meneger).deliver_now
+
       end
 
     end
 
-    def create_book_xls
+    def create_book_xls(price_path)
 
       # Создание объекта для XLS-файла
       @xls_file = Spreadsheet::Workbook.new
@@ -126,7 +153,7 @@ module CreateFileXlsMethods
       @xls_file.write xls_data
 
       # Сохраняем файл на сервере
-      File.open(@price_path, 'wb') { |f| f.write(xls_data.string) }
+      File.open(price_path, 'wb') { |f| f.write(xls_data.string) }
 
     end
 
@@ -188,12 +215,13 @@ module CreateFileXlsMethods
       return str.match?(/\A(?:\d+(?:[.,]\d*)?|\>\d+|[\d\s.,]+)\z/)
     end
 
-    def hash_value_keys_partner(tk_ilsh, tk_cmk, tk_shop, skl_pdrzd, skl_gorod)
+    def hash_value_keys_partner(tk_ilsh, tk_cmk, tk_shop, skl_pdrzd, skl_gorod, hash_email_price)
       { TipKontragentaILSh: tk_ilsh,
         TipKontragentaCMK: tk_cmk,
         TipKontragentaSHOP: tk_shop,
         Podrazdelenie: skl_pdrzd,
-        Gorod: skl_gorod
+        Gorod: skl_gorod,
+        hash_email_price: hash_email_price
       }
     end
 
@@ -205,7 +233,6 @@ module CreateFileXlsMethods
     end
 
     def set_dopemail
-      @file_price_dopemail_path = "/home/user/RubymineProjects/myProject/send_email/lib/assets/test_price_dopemail.json"
       json_string = File.read(@file_price_dopemail_path)
       arr_dopemail = JSON.parse(json_string).to_a
       result = {}
@@ -220,6 +247,10 @@ module CreateFileXlsMethods
         end
       end
       result
+      # пример вывода:
+      # {"iiiiiii@gmail.com"=>{"Легковые шины"=>"Мин", "Диски"=>"Опт"},
+      #  "speczapchast.agro@ukr.net"=>{"Легковые шины"=>"Мин", "Диски"=>"Опт"},
+      #  "mpkcompany5@gmail.com"=>{"Легковые шины"=>"Мин", "Диски"=>"Опт"}}
 
     end
 
@@ -315,6 +346,11 @@ module CreateFileXlsMethods
           else
             price = []
           end
+
+          # Добавить к списку цен индивидуальную колонку
+          price << hash_value[:hash_email_price][sheet_name] if hash_value[:hash_email_price][sheet_name].present?
+
+
 
           # ====================================================
           # Определение дополнительного склада для подразделения
