@@ -342,14 +342,11 @@ module CreateFileXlsMethods
                 price << el["prices"] if el["type"] == result2
               end
             end
-            price = price.flatten.uniq
-          else
-            price = []
-          end
 
+          end
           # Добавить к списку цен индивидуальную колонку
           price << hash_value[:hash_email_price][sheet_name] if hash_value[:hash_email_price][sheet_name].present?
-
+          price = price.flatten.uniq
 
 
           # ====================================================
