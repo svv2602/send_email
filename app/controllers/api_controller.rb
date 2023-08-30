@@ -1,5 +1,6 @@
 require 'httparty'
 require 'spreadsheet'
+require 'benchmark'
 
 class ApiController < ApplicationController
   include DataAccessMethods
@@ -29,25 +30,35 @@ class ApiController < ApplicationController
   end
 
   def send_emails
-    # Получить данные
-    run_import_data_from_api
 
-    # Установить файлы с настройками прайсов (раскомментировать нужное):
-    # ================================================================
-    # Путь к файлам lib/assets/
-    # Использовать тестовые файлы
-    set_json_files_path("test_price_settings", "test_price_aliases",
-                        "test_price_dopemail", "test_price_textshapka" )
+    # Замеряем время выполнения
+    time = Benchmark.realtime do
 
-    # Использовать файлы, полученные по API
-    # set_json_files_path("price_settings", "price_aliases", "price_dopemail", "price_textshapka")
-    # ================================================================
+      # Получить данные
+      run_import_data_from_api
 
-    # Проверка, если Без параметров - отправка тестовому списку клиентов
-    set_test_data unless params[:production].to_i == 1
+      # Установить файлы с настройками прайсов (раскомментировать нужное):
+      # ================================================================
+      # Путь к файлам lib/assets/
+      # Использовать тестовые файлы
+      set_json_files_path("test_price_settings", "test_price_aliases",
+                          "test_price_dopemail", "test_price_textshapka")
 
-    # Выполнить отправку  почты
-    run_methods(:send_emails_to_partners)
+      # Использовать файлы, полученные по API
+      # set_json_files_path("price_settings", "price_aliases", "price_dopemail", "price_textshapka")
+      # ================================================================
+
+      # Проверка, если Без параметров - отправка тестовому списку клиентов
+      set_test_data unless params[:production].to_i == 1
+
+      # Выполнить отправку  почты
+      run_methods(:send_emails_to_partners)
+
+    end
+
+    @msg_data_load += "\n\n  Прошло #{time.round(2)} секунд"
+    puts @msg_data_load
+
     render plain: @msg_data_load + "\n\n #{Time.now}"
   end
 
@@ -88,6 +99,7 @@ class ApiController < ApplicationController
     render plain: @msg_data_load + "\nОтчет создан: #{Time.now}"
 
   end
+
   def set_msg_data_load
     @msg_data_load = ""
   end

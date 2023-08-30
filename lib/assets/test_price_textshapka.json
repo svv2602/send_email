@@ -16,8 +16,8 @@
         "text": "Новый ассортимет летних шин Bridgestone",
         "colorfont": "gray",
         "colorbackground": "yellow",
-        "bold": "Нет",
-        "italic": "Нет",
+        "bold": false,
+        "italic": true,
         "size": 18
       }
     ]
@@ -33,6 +33,20 @@
         "bold": "Да",
         "italic": "Нет",
         "size": 24
+      }
+    ]
+  },
+  {
+    "list": "СХ",
+    "data": [
+      {
+        "number": 1,
+        "text": "Прайс-лист на сельхоз шины",
+        "colorfont": "reццd",
+        "colorbackground": "blццack",
+        "bold": "Да",
+        "italic": "Нет",
+        "size": 22
       }
     ]
   }

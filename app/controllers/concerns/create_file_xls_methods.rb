@@ -66,6 +66,9 @@ module CreateFileXlsMethods
 
       # сделать хеш дополнительных цен для email
       hash_dop_email = set_dopemail
+      i = 0 # количество отправок
+      j1 = 0 # количество прайсов
+      j2 = 0 # количество индивидуальных прайсов
 
       # Обработка результатов
       results.each do |row|
@@ -87,6 +90,7 @@ module CreateFileXlsMethods
           set_price_sheet_attributes(@hash_value) # хеш настроек для создания листов прайса
           create_book_xls(@price_path)
           params = row["params"]
+          j1 += 1 # количество прайсов
         end
 
         # ===================================================================
@@ -105,13 +109,21 @@ module CreateFileXlsMethods
 
           set_price_sheet_attributes(@hash_value) # хеш настроек для создания листов прайса
           create_book_xls(@price_ind_path)
+          j2 += 1 # количество индивидуальных прайсов
         end
 
         # отправить прайс
         file_path_to_send = hash_dop_email.include?(recipient_email) ? @price_ind_path : @price_path
+
         MyMailer.send_email_with_attachment(recipient_email.to_s, file_path_to_send, osnovnoi_meneger).deliver_now
 
+        i += 1 # количество отправок
       end
+
+      @msg_data_load += "\n"
+      @msg_data_load += "количество сформированных прайсов #{j1}\n"
+      @msg_data_load += "количество сформированных индивидуальных прайсов #{j2}\n"
+      @msg_data_load += "количество отправок #{i}\n"
 
     end
 
@@ -250,8 +262,8 @@ module CreateFileXlsMethods
             current_style = Spreadsheet::Format.new(color: el["colorfont"]&.to_sym || :black,
                                                     pattern: 1,
                                                     pattern_fg_color: el["colorbackground"]&.to_sym || :white,
-                                                    bold: el["bold"]&.downcase == "да" || false,
-                                                    italic: el["italic"]&.downcase == "да" || false,
+                                                    bold: el["bold"]&.to_s.downcase == "да" || false,
+                                                    italic: el["italic"]&.to_s.downcase == "да" || false,
                                                     size: size_value,
                                                     text_wrap: true,
                                                     horizontal_align: :center,
@@ -367,12 +379,12 @@ module CreateFileXlsMethods
       list = {}
       if hash_settings
         hash_settings.each do |key, value|
-          sheet_name = ""
           skl = []
           city = []
           grup = []
           podrazdel = []
           price = []
+          sheet_name = ""
           product = []
           sheet_select_product = {}
           max_count = 0
@@ -482,7 +494,7 @@ module CreateFileXlsMethods
       # формирование тестового набора данных в таблице partners в рабочей базе
       podrazdelenie = ["Одесса ОСПП", "Тендерный отдел",
                        "Ровно ОСПП", "Львов ОСПП", "Кривой Рог ОСПП",
-                       "", "Тернополь ОСПП"]
+                       "Тернополь ОСПП"]
       type = ["B2B",
               "B2C более 50 т.с",
               "B2C до 50 т.с.",
