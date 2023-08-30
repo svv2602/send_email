@@ -92,6 +92,11 @@ module ResponseAggregatorMethods
 
     end
 
+    def contains_only_brackets?(string)
+      # Используем регулярное выражение для проверки наличия только скобок в строке
+      /^[()]*$/.match?(string)
+    end
+
     def build_leftovers_combined_query(hash_with_params_sklad)
       @params_sklad = hash_with_params_sklad
       strSql = 'products.*'
@@ -99,13 +104,23 @@ module ResponseAggregatorMethods
       leftover_query = Leftover.joins(:product)
                                .select("Leftovers.Artikul as artikul, products.TovarnayaKategoriya as Tovar_Kategoriya,
                                     #{@params_sklad[:array_query1_select]}")
-                               .where("(#{@params_sklad[:array_query1_where]})")
+                               # .where("(#{@params_sklad[:array_query1_where]})")
+                               .tap do |query|
+        unless @params_sklad[:array_query1_where].blank? || contains_only_brackets?(@params_sklad[:array_query1_where])
+          query = query.where("(#{@params_sklad[:array_query1_where]})")
+        end
+      end
                                .group("Leftovers.Artikul, products.TovarnayaKategoriya")
 
       price_query = Price.joins(:product)
                          .select("Prices.Artikul as artikul, products.TovarnayaKategoriya as Tovar_Kategoriya,
                               #{@params_sklad[:array_query2_select]}")
-                         .where("(#{@params_sklad[:array_query2_where]})")
+                         # .where("(#{@params_sklad[:array_query2_where]})")
+                      .tap do |query|
+        unless @params_sklad[:array_query2_where].blank? || contains_only_brackets?(@params_sklad[:array_query2_where])
+          query = query.where("(#{@params_sklad[:array_query2_where]})")
+        end
+      end
                          .group("Prices.Artikul, products.TovarnayaKategoriya")
 
       @combined_results = Leftover.from("(#{leftover_query.to_sql} UNION #{price_query.to_sql}) AS leftovers_combined")

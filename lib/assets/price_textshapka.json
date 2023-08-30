@@ -4,15 +4,19 @@
 "text": "Скидка на зимние шины 3% от цены прайса",
 "colorfont": "yellow",
 "colorbackground": "purple",
-"bolt": "Нет",
-"italic": "Нет"
+"bold": "Нет",
+"italic": "Нет",
+"size": 0,
+"list": ""
 },
 {
 "number": 2,
 "text": "Скидка на зимние шины 3% от цены прайса",
 "colorfont": "yellow",
 "colorbackground": "maroon",
-"bolt": "Да",
-"italic": "Да"
+"bold": "Да",
+"italic": "Да",
+"size": 0,
+"list": ""
 }
 ]

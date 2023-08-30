@@ -120,10 +120,6 @@ module CreateFileXlsMethods
       # Создание объекта для XLS-файла
       @xls_file = Spreadsheet::Workbook.new
 
-      # полный список стандартных имен цветов, поддерживаемых в библиотеке spreadsheet
-      #   [:black, :white, :red, :green, :blue, :yellow, :purple, :orange,
-      #    :gray, :brown, :cyan, :magenta, :silver, :lime, :navy,
-      #     :fuchsia, :aqua]
 
       # Создание стиля для зеленого фона
       @green_background = Spreadsheet::Format.new(color: :black, pattern: 1,
