@@ -93,7 +93,7 @@ module ResponseAggregatorMethods
     end
 
     def contains_only_brackets?(string)
-      # Используем регулярное выражение для проверки наличия только скобок в строке
+      # регулярное выражение для проверки наличия в строке только скобок
       /^[()]*$/.match?(string)
     end
 

@@ -153,6 +153,8 @@ module CreateFileXlsMethods
     def creat_sheet_xls(el_hash)
       # Установить параметры для построения прайса
       set_sheet_params_new(el_hash)
+      # Создать переменную cо значениями алиасов
+      set_alias_arr
 
       # Получить хеш с для построения запроса
       hash_with_params_sklad = hash_query_params_all(@skl, @city, @grup, @podrazdel, @price, @product, @max_count, @sheet_select)
@@ -161,7 +163,7 @@ module CreateFileXlsMethods
       grouped_results = results.group(:artikul, :Tovar_Kategoriya)
                                .select(hash_grouped_name_collumns(hash_with_params_sklad)[:attr_query])
 
-      xls_sheet = @xls_file.create_worksheet(name: @sheet_name)
+      xls_sheet = @xls_file.create_worksheet(name: set_alias_el(@sheet_name))
 
       correction_index = 0
 
@@ -316,16 +318,30 @@ module CreateFileXlsMethods
 
     end
 
-    def set_alias(arr_name_columns)
-
+    def set_alias_arr
       json_string = File.read(@file_price_aliases_path)
-      arr_aliases = JSON.parse(json_string).to_a
-      result = []
+      @arr_aliases = JSON.parse(json_string).to_a
+    end
 
+    def set_alias_el(el)
+      found_alias = nil  # Инициализируем переменную перед блоком each
+      @arr_aliases.each do |alias_hash|
+        normalized_key = alias_hash["Объект"].gsub(" ", "").downcase
+        if normalized_key == el.gsub(" ", "").downcase
+          found_alias = alias_hash["Алиас"]
+          break
+        end
+      end
+      result = (found_alias || el)
+    end
+    def set_alias(arr_name_columns)
+      # json_string = File.read(@file_price_aliases_path)
+      # arr_aliases = JSON.parse(json_string).to_a
+      result = []
       arr_name_columns.each do |name_column|
         found_alias = nil
 
-        arr_aliases.each do |alias_hash|
+        @arr_aliases.each do |alias_hash|
           normalized_key = alias_hash["Объект"].gsub(" ", "").downcase
           if normalized_key == name_column.gsub(" ", "").downcase
             found_alias = alias_hash["Алиас"]
