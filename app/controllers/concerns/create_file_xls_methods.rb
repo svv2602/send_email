@@ -516,12 +516,13 @@ module CreateFileXlsMethods
 
       email = ["svv2602@gmail.com", "snisar.vv@tot.biz.ua"]
 
-      10.times do |i|
+      count_simple = 5 # количество примеров
+      count_simple.times do |i|
         Partner.create!(
           Kontragent: "Контрагент #{i}",
           Email: email[rand(email.size)],
           Partner: "Партнер #{i}",
-          OsnovnoiMeneger: "Менеджер #{i}",
+          OsnovnoiMeneger: "Менеджер #{rand(count_simple)}",
           TelefonPodrazdeleniia: "123-456-789",
           Gorod: city[rand(city.size)],
           TipKontragentaILSh: type[rand(type.size)],
