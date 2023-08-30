@@ -120,16 +120,15 @@ module CreateFileXlsMethods
       # Создание объекта для XLS-файла
       @xls_file = Spreadsheet::Workbook.new
 
-
       # Создание стиля для зеленого фона
       @header_style = Spreadsheet::Format.new(color: :black,
-                                                  pattern: 1,
-                                                  pattern_fg_color: :cyan,
-                                                  border: :thin,
-                                                  text_wrap: true,
-                                                  bold: true,
-                                                  vertical_align: :top,
-                                                  horizontal_align: :center
+                                              pattern: 1,
+                                              pattern_fg_color: :cyan,
+                                              border: :thin,
+                                              text_wrap: true,
+                                              bold: true,
+                                              vertical_align: :top,
+                                              horizontal_align: :center
       )
       # Создание стиля с границей
       @border_style = Spreadsheet::Format.new(border: :thin, color: :black, size: 10, text_wrap: true)
@@ -207,7 +206,7 @@ module CreateFileXlsMethods
       end
 
       correction_index = 0
-      create_head_sheet(xls_sheet, correction_index, column_names.size)
+      create_head_sheet(xls_sheet, correction_index, column_names.size, @sheet_name)
 
     end
 
@@ -233,35 +232,40 @@ module CreateFileXlsMethods
       new_arr
     end
 
-    def create_head_sheet(xls_sheet, correction_index, column_count)
+    def create_head_sheet(xls_sheet, correction_index, column_count, sheet_name)
+
       json_string = File.read(@file_price_textshapka_path)
-      arr_attr = norma_color(JSON.parse(json_string).to_a)
+      arr_full = JSON.parse(json_string).to_a
       row_begin = correction_index
-      current_style = {}
-      arr_attr.each do |el|
-        unless el["text"].nil?
-          # Создание стиля
-          size_value = el["size"].to_i
-          size_value = 12 unless (10..24).include?(size_value)
-          current_style = Spreadsheet::Format.new(color: el["colorfont"]&.to_sym || :black,
-                                                  pattern: 1,
-                                                  pattern_fg_color: el["colorbackground"]&.to_sym || :white,
-                                                  bold: el["bold"]&.downcase == "да" || false,
-                                                  italic: el["italic"]&.downcase == "да" || false,
-                                                  size: size_value,
-                                                  text_wrap: true,
-                                                  horizontal_align: :center,
-                                                  vertical_align: :center
-          )
+      # выполняем добавление строк, если есть соответствующий лист
+      if arr_full.any? { |element| element["list"] == sheet_name }
+        arr_attr = norma_color(arr_full.find { |element| element["list"] == sheet_name }["data"])
 
-          insert_row_and_format_block(xls_sheet, correction_index, column_count, current_style)
+        current_style = {}
+        arr_attr.each do |el|
+          unless el["text"].nil?
+            # Создание стиля
+            size_value = el["size"].to_i
+            size_value = 12 unless (10..24).include?(size_value)
+            current_style = Spreadsheet::Format.new(color: el["colorfont"]&.to_sym || :black,
+                                                    pattern: 1,
+                                                    pattern_fg_color: el["colorbackground"]&.to_sym || :white,
+                                                    bold: el["bold"]&.downcase == "да" || false,
+                                                    italic: el["italic"]&.downcase == "да" || false,
+                                                    size: size_value,
+                                                    text_wrap: true,
+                                                    horizontal_align: :center,
+                                                    vertical_align: :center
+            )
 
-          xls_sheet[correction_index, 0] = el["text"]
-          # Установка высоты строки
-          xls_sheet.row(correction_index).height = 30
+            insert_row_and_format_block(xls_sheet, correction_index, column_count, current_style)
 
-          correction_index += 1
+            xls_sheet[correction_index, 0] = el["text"]
+            # Установка высоты строки
+            xls_sheet.row(correction_index).height = 30
 
+            correction_index += 1
+          end
         end
       end
       # добавить строку разрыва между заголовком и таблицей
@@ -329,7 +333,7 @@ module CreateFileXlsMethods
     end
 
     def set_alias_el(el)
-      found_alias = nil  # Инициализируем переменную перед блоком each
+      found_alias = nil # Инициализируем переменную перед блоком each
       @arr_aliases.each do |alias_hash|
         normalized_key = alias_hash["Объект"].gsub(" ", "").downcase
         if normalized_key == el.gsub(" ", "").downcase

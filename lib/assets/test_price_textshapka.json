@@ -1,28 +1,39 @@
 [
   {
-    "number": 1,
-    "text": "Скидка на зимние шины 3% от цены прайса",
-    "colorfont": "порпаво",
-    "colorbackground": "white",
-    "bold": "Да",
-    "italic": "Нет",
-    "size": 12
+    "list": "Легковые шины",
+    "data": [
+      {
+        "number": 1,
+        "text": "Скидка на зимние шины 3% от цены прайса",
+        "colorfont": "red",
+        "colorbackground": "lime",
+        "bold": "Да",
+        "italic": "Да",
+        "size": 16
+      },
+      {
+        "number": 2,
+        "text": "Новый ассортимет летних шин Bridgestone",
+        "colorfont": "gray",
+        "colorbackground": "yellow",
+        "bold": "Нет",
+        "italic": "Нет",
+        "size": 18
+      }
+    ]
   },
   {
-    "number": 2,
-    "text": "Скидка плоплпоплплпо прайса",
-    "colorfont": "whаЫАite",
-    "colorbackground": "ыААЫ",
-    "bold": "Да",
-    "italic": "Да",
-    "size": 12
-  },
-  {
-    "number": 3,
-    "text": "ПРИВЕТ",
-    "colorfont": "black",
-    "bold": "НЕТ",
-    "size": 12
+    "list": "Диски",
+    "data": [
+      {
+        "number": 1,
+        "text": "Скидка  от цены прайса",
+        "colorfont": "red",
+        "colorbackground": "black",
+        "bold": "Да",
+        "italic": "Нет",
+        "size": 24
+      }
+    ]
   }
-
 ]
