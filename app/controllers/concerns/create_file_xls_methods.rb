@@ -122,13 +122,14 @@ module CreateFileXlsMethods
 
 
       # Создание стиля для зеленого фона
-      @green_background = Spreadsheet::Format.new(color: :black, pattern: 1,
+      @header_style = Spreadsheet::Format.new(color: :black,
+                                                  pattern: 1,
                                                   pattern_fg_color: :cyan,
                                                   border: :thin,
                                                   text_wrap: true,
                                                   bold: true,
-                                                  vertical_align: :top, # Установка вертикального выравнивания
-                                                  horizontal_align: :center # Установка горизонтального выравнивания
+                                                  vertical_align: :top,
+                                                  horizontal_align: :center
       )
       # Создание стиля с границей
       @border_style = Spreadsheet::Format.new(border: :thin, color: :black, size: 10, text_wrap: true)
@@ -154,7 +155,7 @@ module CreateFileXlsMethods
       # Установить параметры для построения прайса
       set_sheet_params_new(el_hash)
       # Создать переменную cо значениями алиасов
-      set_alias_arr
+      set_variable_with_array_of_aliases
 
       # Получить хеш с для построения запроса
       hash_with_params_sklad = hash_query_params_all(@skl, @city, @grup, @podrazdel, @price, @product, @max_count, @sheet_select)
@@ -177,7 +178,7 @@ module CreateFileXlsMethods
       # Применение стиля к каждой ячейке заголовков, если она содержит значение
       new_column_names.each_with_index do |value, col_index|
         if value.present?
-          xls_sheet.row(correction_index).set_format(col_index, @green_background)
+          xls_sheet.row(correction_index).set_format(col_index, @header_style)
         end
       end
       # Установка высоты строки
@@ -236,7 +237,7 @@ module CreateFileXlsMethods
       json_string = File.read(@file_price_textshapka_path)
       arr_attr = norma_color(JSON.parse(json_string).to_a)
       row_begin = correction_index
-
+      current_style = {}
       arr_attr.each do |el|
         unless el["text"].nil?
           # Создание стиля
@@ -249,18 +250,12 @@ module CreateFileXlsMethods
                                                   italic: el["italic"]&.downcase == "да" || false,
                                                   size: size_value,
                                                   text_wrap: true,
-                                                  horizontal_align: :center, # Установка горизонтального выравнивания
-                                                  vertical_align: :center # Установка вертикального выравнивания
+                                                  horizontal_align: :center,
+                                                  vertical_align: :center
           )
 
-          xls_sheet.insert_row(correction_index)
-          # Применение стиля к каждой ячейке заголовков, если она содержит значение
-          column_count.times do |column|
-            xls_sheet[correction_index, column] = 1
-            xls_sheet.row(correction_index).set_format(column, current_style)
-          end
+          insert_row_and_format_block(xls_sheet, correction_index, column_count, current_style)
 
-          xls_sheet.merge_cells(correction_index, 0, correction_index, column_count - 1)
           xls_sheet[correction_index, 0] = el["text"]
           # Установка высоты строки
           xls_sheet.row(correction_index).height = 30
@@ -270,7 +265,17 @@ module CreateFileXlsMethods
         end
       end
       # добавить строку разрыва между заголовком и таблицей
-      xls_sheet.insert_row(correction_index) if row_begin < correction_index
+      insert_row_and_format_block(xls_sheet, correction_index, column_count, current_style) if row_begin < correction_index
+    end
+
+    def insert_row_and_format_block(xls_sheet, correction_index, column_count, current_style)
+      xls_sheet.insert_row(correction_index)
+      # Применение стиля к каждой ячейке заголовков, если она содержит значение
+      column_count.times do |column|
+        xls_sheet[correction_index, column] = " "
+        xls_sheet.row(correction_index).set_format(column, current_style)
+      end
+      xls_sheet.merge_cells(correction_index, 0, correction_index, column_count - 1)
     end
 
     def contains_only_digits_spaces_dots_and_commas?(str)
@@ -318,7 +323,7 @@ module CreateFileXlsMethods
 
     end
 
-    def set_alias_arr
+    def set_variable_with_array_of_aliases
       json_string = File.read(@file_price_aliases_path)
       @arr_aliases = JSON.parse(json_string).to_a
     end
@@ -328,30 +333,18 @@ module CreateFileXlsMethods
       @arr_aliases.each do |alias_hash|
         normalized_key = alias_hash["Объект"].gsub(" ", "").downcase
         if normalized_key == el.gsub(" ", "").downcase
-          found_alias = alias_hash["Алиас"]
+          found_alias = alias_hash["Алиас"] unless alias_hash["Алиас"]&.empty?
           break
         end
       end
       result = (found_alias || el)
     end
+
     def set_alias(arr_name_columns)
-      # json_string = File.read(@file_price_aliases_path)
-      # arr_aliases = JSON.parse(json_string).to_a
       result = []
       arr_name_columns.each do |name_column|
-        found_alias = nil
-
-        @arr_aliases.each do |alias_hash|
-          normalized_key = alias_hash["Объект"].gsub(" ", "").downcase
-          if normalized_key == name_column.gsub(" ", "").downcase
-            found_alias = alias_hash["Алиас"]
-            break
-          end
-        end
-
-        result << (found_alias || name_column)
+        result << set_alias_el(name_column)
       end
-
       result
     end
 
