@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2023_08_15_061646) do
+ActiveRecord::Schema[7.0].define(version: 2023_08_31_105146) do
   create_table "data_write_statuses", force: :cascade do |t|
     t.boolean "in_progress"
     t.datetime "created_at", null: false
@@ -88,6 +88,7 @@ ActiveRecord::Schema[7.0].define(version: 2023_08_15_061646) do
     t.text "KodUKTVED", default: ""
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "Naimenovanie", default: ""
   end
 
 end

@@ -93,7 +93,6 @@ module InputDataMethods
 
     end
 
-
     def ert
 
     end
@@ -104,6 +103,7 @@ module InputDataMethods
         Product: {
           Artikul: "Артикул",
           Nomenklatura: "Номенклатура",
+          Naimenovanie: "Наименование",
           Ves: "Вес",
           Proizvoditel: "Производитель",
           VidNomenklatury: "ВидНоменклатуры",

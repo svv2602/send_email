@@ -143,7 +143,9 @@ module CreateFileXlsMethods
                                               horizontal_align: :center
       )
       # Создание стиля с границей
-      @border_style = Spreadsheet::Format.new(border: :thin, color: :black, size: 10, text_wrap: true)
+      @border_style = Spreadsheet::Format.new(border: :thin, color: :black, size: 10, text_wrap: true,
+                                              vertical_align: :top,
+                                              horizontal_align: :left)
       # Создание стиля с границей
       @border_style_with_right_align = Spreadsheet::Format.new(border: :thin, color: :black, size: 10,
                                                                text_wrap: true, horizontal_align: :right)
@@ -512,7 +514,7 @@ module CreateFileXlsMethods
 
       email = ["postmaster@tot.biz.ua", "prokoleso_logs@tot.biz.ua",
                "test@tot.biz.ua", "test1@tot.biz.ua","pogoreltsev.iv@tot.biz.ua",
-               "test2@tot.biz.ua", "test3@tot.biz.ua", "test4@tot.biz.ua"]
+               "test2@tot.biz.ua", "test3@tot.biz.ua", "test4@tot.biz.ua","pogoreltsev.iv@tot.biz.ua"]
 
       email = ["svv2602@gmail.com", "snisar.vv@tot.biz.ua","pogoreltsev.iv@tot.biz.ua"]
 
