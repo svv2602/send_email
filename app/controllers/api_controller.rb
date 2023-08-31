@@ -41,11 +41,10 @@ class ApiController < ApplicationController
       # ================================================================
       # Путь к файлам lib/assets/
       # Использовать тестовые файлы
-      set_json_files_path("test_price_settings", "test_price_aliases",
-                          "test_price_dopemail", "test_price_textshapka")
+      # set_json_files_path("test_price_settings", "test_price_aliases", "test_price_dopemail", "test_price_textshapka")
 
       # Использовать файлы, полученные по API
-      # set_json_files_path("price_settings", "price_aliases", "price_dopemail", "price_textshapka")
+      set_json_files_path("price_settings", "price_aliases", "price_dopemail", "price_textshapka")
       # ================================================================
 
       # Проверка, если Без параметров - отправка тестовому списку клиентов

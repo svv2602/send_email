@@ -4,12 +4,12 @@ module CreateFileXlsMethods
   included do
     def set_sheet_params_new(el_hash)
       @sheet_name = el_hash[:sheet_name]
-      @skl = el_hash[:skl].uniq.reject { |value| value.empty? }
-      @city = el_hash[:city].uniq.reject { |value| value.empty? }
-      @grup = el_hash[:grup].uniq.reject { |value| value.empty? }
-      @podrazdel = el_hash[:podrazdel].uniq.reject { |value| value.empty? }
-      @price = el_hash[:price].uniq.reject { |value| value.empty? }
-      @product = el_hash[:product].uniq.reject { |value| value.empty? }
+      @skl = el_hash[:skl].uniq.reject { |value| value.nil? ||value.empty? }
+      @city = el_hash[:city].uniq.reject { |value| value.nil? ||value.empty? }
+      @grup = el_hash[:grup].uniq.reject { |value| value.nil? ||value.empty? }
+      @podrazdel = el_hash[:podrazdel].uniq.reject { |value| value.nil? ||value.empty? }
+      @price = el_hash[:price].uniq.reject { |value| value.nil? ||value.empty? }
+      @product = el_hash[:product].uniq.reject { |value| value.nil? ||value.empty? }
       @max_count = el_hash[:max_count]
       @sheet_select = el_hash[:sheet_select_product]
 
@@ -511,12 +511,12 @@ module CreateFileXlsMethods
               "Кривий Ріг", "Харків", "Вінниця", "Львів"]
 
       email = ["postmaster@tot.biz.ua", "prokoleso_logs@tot.biz.ua",
-               "test@tot.biz.ua", "test1@tot.biz.ua",
+               "test@tot.biz.ua", "test1@tot.biz.ua","pogoreltsev.iv@tot.biz.ua",
                "test2@tot.biz.ua", "test3@tot.biz.ua", "test4@tot.biz.ua"]
 
-      email = ["svv2602@gmail.com", "snisar.vv@tot.biz.ua"]
+      email = ["svv2602@gmail.com", "snisar.vv@tot.biz.ua","pogoreltsev.iv@tot.biz.ua"]
 
-      count_simple = 5 # количество примеров
+      count_simple = 10 # количество примеров
       count_simple.times do |i|
         Partner.create!(
           Kontragent: "Контрагент #{i}",

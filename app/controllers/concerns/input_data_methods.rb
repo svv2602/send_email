@@ -48,11 +48,12 @@ module InputDataMethods
 
     def import_data_load
       # удалить тестовые данные
-      Partner.delete_all if Partner.exists?(test: true) && params[:production].to_i == 1
+      Partner.where(test: true).delete_all if Partner.exists?(test: true) && params[:production].to_i == 1
+      Partner.where(test: false).delete_all if Partner.exists?(test: false) && params[:production].to_i != 1
+
       @msg_data_load = ""
       params_table.each do |el|
         max_update_date = el[:table_key].to_s.capitalize.singularize.constantize.maximum(:updated_at)
-
         if !el[:table_name].capitalize.singularize.constantize.none? && max_update_date&.to_date == Date.current
           @msg_data_load_select = "Данные #{el[:table_key].to_s} были загружены  #{max_update_date} и не требуют обновления \n"
           puts @msg_data_load_select

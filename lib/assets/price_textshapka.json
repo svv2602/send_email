@@ -1,22 +1,25 @@
 [
 {
+"list": "Легковые шины",
+"data": [
+{
 "number": 1,
-"text": "Скидка на зимние шины 3% от цены прайса",
+"text": "Тестовий текст. Знижка! 5 %",
 "colorfont": "yellow",
 "colorbackground": "purple",
-"bold": "Нет",
-"italic": "Нет",
-"size": 0,
-"list": "Легковые шины"
+"bold": false,
+"italic": false,
+"size": 0
 },
 {
 "number": 2,
-"text": "Скидка на зимние шины 3% от цены прайса",
+"text": "Знижка на шини Kumho 3% та безкоштовна доставка",
 "colorfont": "yellow",
 "colorbackground": "maroon",
-"bold": "Да",
-"italic": "Да",
-"size": 0,
-"list": "Легковые шины"
+"bold": true,
+"italic": true,
+"size": 0
+}
+]
 }
 ]
