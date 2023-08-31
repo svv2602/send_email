@@ -10,3 +10,4 @@ end
 
 # Запуск rails db:setup
 system('bundle exec rails db:setup')
+system('bundle exec rails db:setup RAILS_ENV=production')
