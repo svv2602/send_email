@@ -104,7 +104,6 @@ module ResponseAggregatorMethods
       leftover_query = Leftover.left_joins(:product)
                                .select("Leftovers.Artikul as artikul, products.TovarnayaKategoriya as Tovar_Kategoriya,
                                     #{@params_sklad[:array_query1_select]}")
-                               # .where("(#{@params_sklad[:array_query1_where]})")
                                .tap do |query|
         unless @params_sklad[:array_query1_where].blank? || contains_only_brackets?(@params_sklad[:array_query1_where])
           query.where!("(#{@params_sklad[:array_query1_where]})")
@@ -113,9 +112,8 @@ module ResponseAggregatorMethods
                                .group("Leftovers.Artikul, products.TovarnayaKategoriya")
 
       price_query = Price.joins(:product)
-                         .select("NULL as artikul, products.TovarnayaKategoriya as Tovar_Kategoriya,
+                         .select("products.Artikul as artikul, products.TovarnayaKategoriya as Tovar_Kategoriya,
                               #{@params_sklad[:array_query2_select]}")
-                         # .where("(#{@params_sklad[:array_query2_where]})")
                          .tap do |query|
         unless @params_sklad[:array_query2_where].blank? || contains_only_brackets?(@params_sklad[:array_query2_where])
           query.where!("(#{@params_sklad[:array_query2_where]})")
@@ -124,8 +122,10 @@ module ResponseAggregatorMethods
                          .group("Prices.Artikul, products.TovarnayaKategoriya")
 
       @combined_results = Leftover.from("(#{leftover_query.to_sql} UNION #{price_query.to_sql}) AS leftovers_combined")
-                                  .where.not("leftovers_combined.artikul IS NULL")
+                                  # .where.not("leftovers_combined.artikul IS NULL")
                                   .order("leftovers_combined.Tovar_Kategoriya, leftovers_combined.artikul")
+
+
 
     end
 

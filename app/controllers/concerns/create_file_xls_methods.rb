@@ -70,6 +70,16 @@ module CreateFileXlsMethods
       j1 = 0 # количество прайсов
       j2 = 0 # количество индивидуальных прайсов
 
+      # Удалить цены для товаров без остатков
+      Price.connection.exec_query("
+          DELETE FROM prices
+          WHERE NOT EXISTS (
+            SELECT *
+            FROM leftovers
+            WHERE prices.Artikul = leftovers.Artikul
+          );
+        ")
+
       # Обработка результатов
       results.each do |row|
         osnovnoi_meneger = row["OsnovnoiMeneger"]
@@ -368,6 +378,8 @@ module CreateFileXlsMethods
 
     def set_price_sheet_attributes(hash_value)
       tabPartner = db_columns[:Partner]
+
+
 
       # hash_value_keys_partner = @hash_value
       json_string = File.read(@file_price_settings_path)
