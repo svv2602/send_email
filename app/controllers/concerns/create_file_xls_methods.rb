@@ -63,15 +63,6 @@ module CreateFileXlsMethods
       j1 = 0 # количество прайсов
       j2 = 0 # количество индивидуальных прайсов
 
-      # Удалить цены для товаров без остатков
-      Price.connection.exec_query("
-          DELETE FROM prices
-          WHERE NOT EXISTS (
-            SELECT *
-            FROM leftovers
-            WHERE prices.Artikul = leftovers.Artikul
-          );
-        ")
 
       # Обработка результатов
       results.each do |row|
@@ -234,6 +225,7 @@ module CreateFileXlsMethods
       new_arr = []
       arr_attr.each do |el|
         el_hash = {}
+        replace = 0
         el.each do |key, value|
           case key
           when "colorbackground"
@@ -244,6 +236,7 @@ module CreateFileXlsMethods
             el_hash[key] = value
           end
         end
+
         new_arr << el_hash
       end
       new_arr

@@ -46,6 +46,18 @@ module InputDataMethods
       ]
     end
 
+    def delete_empty_records_from_prices
+      # Удалить цены для товаров без остатков
+      Price.connection.exec_query("
+          DELETE FROM prices
+          WHERE NOT EXISTS (
+            SELECT *
+            FROM leftovers
+            WHERE prices.Artikul = leftovers.Artikul
+          );
+        ")
+    end
+
     def import_data_load
       # удалить тестовые данные
       Partner.where(test: true).delete_all if Partner.exists?(test: true) && params[:production].to_i == 1
@@ -67,6 +79,7 @@ module InputDataMethods
           end
         end
       end
+      delete_empty_records_from_prices
 
     end
 
