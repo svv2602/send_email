@@ -87,7 +87,7 @@ class ApiController < ApplicationController
   end
 
   def import_attr
-    # Получить данные и создать файлы settings.json и alias.json
+    # Получить данные и создать файлы json
     run_methods(:get_json_files_from_api)
     render plain: @msg_data_load + "\nОтчет создан: #{Time.now}"
   end
