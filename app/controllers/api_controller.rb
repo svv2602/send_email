@@ -31,26 +31,14 @@ class ApiController < ApplicationController
   end
 
   def send_emails
-
     # Замеряем время выполнения
     time = Benchmark.realtime do
-
       # Получить данные
       run_import_data_from_api
-
-      # Установить файлы с настройками прайсов (раскомментировать нужное):
-      # ================================================================
-      # Путь к файлам lib/assets/
-      # Использовать тестовые файлы
-      # set_json_files_path("test_price_settings", "test_price_aliases", "test_price_dopemail", "test_price_textshapka")
-
-      # Использовать файлы, полученные по API
+      # Установить файлы с настройками прайсов, полученными по API
       set_json_files_path("price_settings", "price_aliases", "price_dopemail", "price_textshapka")
-      # ================================================================
-
       # Проверка, если Без параметров - отправка тестовому списку клиентов
       set_test_data unless params[:production].to_i == 1
-
       # Выполнить отправку  почты
       run_methods(:send_emails_to_partners)
 
@@ -58,7 +46,6 @@ class ApiController < ApplicationController
 
     @msg_data_load += "\n\n  Прошло #{time.round(2)} секунд"
     puts @msg_data_load
-
     render plain: @msg_data_load + "\n\n #{Time.now}"
   end
 
