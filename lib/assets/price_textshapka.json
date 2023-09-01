@@ -1,24 +1,80 @@
 [
 {
+"list": "Грузовые шины",
+"data": [
+{
+"number": 1,
+"text": "Вантажні шини",
+"colorfont": "black",
+"colorbackground": "white",
+"bold": true,
+"italic": false,
+"size": 18
+}
+]
+},
+{
+"list": "СХ",
+"data": [
+{
+"number": 1,
+"text": "СХ шини",
+"colorfont": "black",
+"colorbackground": "white",
+"bold": true,
+"italic": false,
+"size": 18
+}
+]
+},
+{
+"list": "Диски",
+"data": [
+{
+"number": 1,
+"text": "Диски",
+"colorfont": "black",
+"colorbackground": "white",
+"bold": true,
+"italic": false,
+"size": 18
+}
+]
+},
+{
+"list": "Грузовые диски",
+"data": [
+{
+"number": 1,
+"text": "Вантажні диски",
+"colorfont": "black",
+"colorbackground": "white",
+"bold": true,
+"italic": false,
+"size": 18
+}
+]
+},
+{
 "list": "Легковые шины",
 "data": [
 {
 "number": 1,
-"text": "Тестовий текст. Знижка! 5 %",
-"colorfont": "yellow",
-"colorbackground": "purple",
-"bold": false,
+"text": "Легкові шини",
+"colorfont": "black",
+"colorbackground": "white",
+"bold": true,
 "italic": false,
-"size": 0
+"size": 18
 },
 {
 "number": 2,
 "text": "Знижка на шини Kumho 3% та безкоштовна доставка",
-"colorfont": "yellow",
-"colorbackground": "maroon",
+"colorfont": "brown",
+"colorbackground": "white",
 "bold": true,
 "italic": true,
-"size": 0
+"size": 16
 }
 ]
 }

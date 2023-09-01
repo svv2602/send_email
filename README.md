@@ -36,10 +36,10 @@
     # ================================================================
     # Путь к файлам lib/assets/
     # Использовать тестовые файлы:
-    # set_json_files_path("price_settings_copy", "price_aliases_copy")
+    # set_json_files_path("price_settings_copy", ...)
 
     # Использовать файлы, полученные по API
-    # set_json_files_path("price_settings", "price_aliases")
+    # set_json_files_path("price_settings", ...)
     # ================================================================
     # ...
     # end
@@ -56,9 +56,9 @@
 * новое поле из API в базу данных  - нужно сделать новую  миграцию и и установить соответствие в `db_columns`  
 * добавить новую таблицу из API в базу данных  - нужно нужно сделать новую  миграцию, добавить новый элемент в `db_columns` и установить соответствие названий, внести данные в `params_table`
 
-### Настройка тестового списка партнеров в `app/controllers/concerns/create_file_xls_methods.rb`
-* данные для создания партнеров находятся в трех массивах `podrazdelenie`, `type` и `email`
-* в цикле создается 10 записей в таблицу Partner
+### Настройка тестового списка партнеров в `app/controllers/concerns/create_file_xls_data_test.rb`
+* данные для создания партнеров находятся в массивах `podrazdelenie`, `city`, `type` и `email`
+* в цикле создается `count_simple` записей в таблицу Partner
 * Важно: метка `test: true` - для определения тестовых данных
 
 

@@ -7,6 +7,7 @@ class ApiController < ApplicationController
   include InputDataMethods
   include ResponseAggregatorMethods
   include CreateFileXlsMethods
+  include CreateFileXlsDataTest
 
   after_action :delete_old_emails, only: :import_data_from_api
   before_action :set_msg_data_load, only: %i[import_data_from_api send_emails import_attr import_data report]
