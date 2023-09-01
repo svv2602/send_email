@@ -49,11 +49,4 @@ class ExportController < ApplicationController
     ActiveRecord::Base.connection.table_exists?(table_name) ? @tab_class = table_name.capitalize.singularize.constantize : @tab_class = nil
   end
 
-
-
-
-  def delete_directory_with_contents(directory_path)
-    FileUtils.rm_rf(directory_path) if File.directory?(directory_path)
-  end
-
 end
