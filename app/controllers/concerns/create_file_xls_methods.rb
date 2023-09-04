@@ -223,8 +223,10 @@ module CreateFileXlsMethods
         xls_sheet.column(col_index).width = [max_length + 2, 50].min
       end
 
+
       correction_index = 0
       create_head_sheet(xls_sheet, correction_index, column_names.size, @sheet_name)
+
 
     end
 
