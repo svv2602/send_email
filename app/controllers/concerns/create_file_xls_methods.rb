@@ -137,12 +137,21 @@ module CreateFileXlsMethods
                                               horizontal_align: :center
       )
       # Создание стиля с границей
-      @border_style = Spreadsheet::Format.new(border: :thin, color: :black, size: 10, text_wrap: true,
+      @border_style = Spreadsheet::Format.new(border: :thin, color: :black, size: 10,
+                                              text_wrap: true,
                                               vertical_align: :top,
                                               horizontal_align: :left)
       # Создание стиля с границей
       @border_style_with_right_align = Spreadsheet::Format.new(border: :thin, color: :black, size: 10,
-                                                               text_wrap: true, horizontal_align: :right)
+                                                               text_wrap: true,
+                                                               vertical_align: :top,
+                                                               horizontal_align: :right)
+
+      # Создание стиля с границей
+      @border_style_with_center_align = Spreadsheet::Format.new(border: :thin, color: :black, size: 10,
+                                                               text_wrap: true,
+                                                               vertical_align: :center,
+                                                               horizontal_align: :center)
 
       settings_price = set_price_sheet_attributes(@hash_value) # хеш настроек для создания листов прайса
 
@@ -200,7 +209,8 @@ module CreateFileXlsMethods
 
         # Применение стиля с границей к каждой ячейке в строках с данными
         row_values.each_with_index do |cell_value, col_index|
-          format = contains_only_digits_spaces_dots_and_commas?(cell_value) ? @border_style_with_right_align : @border_style
+          # format = contains_only_digits_spaces_dots_and_commas?(cell_value) ? @border_style_with_right_align : @border_style
+          format = column_names[col_index]=="Naimenovanie" ? @border_style : @border_style_with_center_align
           xls_sheet.row(index + correction_index).set_format(col_index, format)
         end
       end

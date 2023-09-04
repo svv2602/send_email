@@ -18,7 +18,7 @@
 "data": [
 {
 "number": 1,
-"text": "СХ шини",
+"text": "СГ шини",
 "colorfont": "black",
 "colorbackground": "white",
 "bold": true,
@@ -66,15 +66,6 @@
 "bold": true,
 "italic": false,
 "size": 18
-},
-{
-"number": 2,
-"text": "Знижка на шини Kumho 3% та безкоштовна доставка",
-"colorfont": "brown",
-"colorbackground": "aqua",
-"bold": true,
-"italic": true,
-"size": 16
 }
 ]
 }
