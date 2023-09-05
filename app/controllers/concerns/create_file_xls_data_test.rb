@@ -31,9 +31,6 @@ module CreateFileXlsDataTest
               "Дніпро", "Тернопіль", "Суми",
               "Кривий Ріг", "Харків", "Вінниця", "Львів"]
 
-      email = ["postmaster@tot.biz.ua", "prokoleso_logs@tot.biz.ua",
-               "test@tot.biz.ua", "test1@tot.biz.ua", "pogoreltsev.iv@tot.biz.ua",
-               "test2@tot.biz.ua", "test3@tot.biz.ua", "test4@tot.biz.ua", "pogoreltsev.iv@tot.biz.ua"]
 
       email = ["snisar.vv@tot.biz.ua", "pogoreltsev.iv@tot.biz.ua",
                "kopanichuck.da@tot.biz.ua", "shabatura.dn@tot.biz.ua",
@@ -41,11 +38,12 @@ module CreateFileXlsDataTest
 
       # email = ["snisar.vv@tot.biz.ua"]
 
-      count_simple = 10 # количество примеров
+      count_simple = email.size # количество примеров по email
+
       count_simple.times do |i|
         Partner.create!(
           Kontragent: "Контрагент #{i}",
-          Email: email[rand(email.size)],
+          Email: email[i],
           Partner: "Партнер #{i}",
           OsnovnoiMeneger: "Менеджер #{rand(count_simple)}",
           TelefonPodrazdeleniia: "123-456-789",
