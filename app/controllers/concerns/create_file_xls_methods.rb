@@ -204,12 +204,17 @@ module CreateFileXlsMethods
 
       # Заполнение таблицы данными
       grouped_results.each_with_index do |leftover, index|
-        row_values = column_names.map { |column| format_value(leftover.send(column)) }
+        # row_values = column_names.map { |column| format_value(leftover.send(column)) }
+        row_values = column_names.map do |column|
+          cell_value = leftover.send(column)
+          cell_value == 0 ? "" : format_value(cell_value)
+        end
         xls_sheet.row(index + correction_index).push(*row_values)
 
         # Применение стиля с границей к каждой ячейке в строках с данными
         row_values.each_with_index do |cell_value, col_index|
           # format = contains_only_digits_spaces_dots_and_commas?(cell_value) ? @border_style_with_right_align : @border_style
+
           format = column_names[col_index]=="Naimenovanie" ? @border_style : @border_style_with_center_align
           xls_sheet.row(index + correction_index).set_format(col_index, format)
         end
