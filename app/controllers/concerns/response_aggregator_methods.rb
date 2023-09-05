@@ -121,10 +121,18 @@ module ResponseAggregatorMethods
       end
                          .group("Prices.Artikul, products.TovarnayaKategoriya")
 
-      @combined_results = Leftover.from("(#{leftover_query.to_sql} UNION #{price_query.to_sql}) AS leftovers_combined")
-                                  # .where.not("leftovers_combined.artikul IS NULL")
-                                  .order("leftovers_combined.Tovar_Kategoriya, leftovers_combined.artikul")
 
+
+      @combined_results = Leftover.from("(#{leftover_query.to_sql} UNION #{price_query.to_sql}) AS leftovers_combined")
+
+      # Создаем объект Arel::Table для leftovers_combined
+      leftovers_combined_table = Arel::Table.new("leftovers_combined")
+      # Создаем выражение COALESCE с использованием Arel
+      coalesce_expression = Arel::Nodes::NamedFunction.new('COALESCE', [leftovers_combined_table[:Razmer],
+                                                                        leftovers_combined_table[:Naimenovanie],
+                                                                         leftovers_combined_table[:artikul]])
+      # Определяем порядок сортировки
+      @combined_results = @combined_results.order(coalesce_expression)
 
 
     end

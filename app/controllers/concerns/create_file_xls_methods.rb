@@ -180,6 +180,7 @@ module CreateFileXlsMethods
       grouped_results = results.group(:artikul, :Tovar_Kategoriya)
                                .select(hash_grouped_name_collumns(hash_with_params_sklad)[:attr_query])
 
+
       xls_sheet = @xls_file.create_worksheet(name: set_alias_el(@sheet_name))
 
       correction_index = 0

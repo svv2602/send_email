@@ -39,7 +39,7 @@ module CreateFileXlsDataTest
                "kopanichuck.da@tot.biz.ua", "shabatura.dn@tot.biz.ua",
                "ivaschenko.sa@tot.biz.ua", "kucherenko.da.tot@gmail.com"]
 
-       # email = ["snisar.vv@tot.biz.ua"]
+       email = ["snisar.vv@tot.biz.ua"]
 
       count_simple = 10 # количество примеров
       count_simple.times do |i|

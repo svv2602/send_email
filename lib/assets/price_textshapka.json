@@ -6,7 +6,7 @@
 "number": 1,
 "text": "Вантажні шини",
 "colorfont": "black",
-"colorbackground": "white",
+"colorbackground": "yellow",
 "bold": true,
 "italic": false,
 "size": 18
@@ -19,8 +19,8 @@
 {
 "number": 1,
 "text": "СГ шини",
-"colorfont": "black",
-"colorbackground": "white",
+"colorfont": "white",
+"colorbackground": "black",
 "bold": true,
 "italic": false,
 "size": 18
@@ -33,8 +33,8 @@
 {
 "number": 1,
 "text": "Диски",
-"colorfont": "black",
-"colorbackground": "white",
+"colorfont": "white",
+"colorbackground": "blue",
 "bold": true,
 "italic": false,
 "size": 18
@@ -48,7 +48,7 @@
 "number": 1,
 "text": "Вантажні диски",
 "colorfont": "black",
-"colorbackground": "white",
+"colorbackground": "yellow",
 "bold": true,
 "italic": false,
 "size": 18
@@ -61,8 +61,8 @@
 {
 "number": 1,
 "text": "Легкові шини",
-"colorfont": "black",
-"colorbackground": "white",
+"colorfont": "white",
+"colorbackground": "blue",
 "bold": true,
 "italic": false,
 "size": 18
