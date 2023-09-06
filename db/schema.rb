@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[7.0].define(version: 2023_09_04_092331) do
+ActiveRecord::Schema[7.0].define(version: 2023_09_06_082602) do
   create_table "data_write_statuses", force: :cascade do |t|
     t.boolean "in_progress"
     t.datetime "created_at", null: false
@@ -93,6 +93,15 @@ ActiveRecord::Schema[7.0].define(version: 2023_09_04_092331) do
     t.string "VidUslugi", default: ""
     t.string "PCDDiska", default: ""
     t.string "DIADiska", default: ""
+    t.string "Tipdiska", default: ""
+    t.string "Shirinadiska", default: ""
+    t.string "Ship", default: ""
+    t.string "Os", default: ""
+    t.string "KodyTRAOTR", default: ""
+    t.string "Indekssloy̆nosti", default: ""
+    t.string "Usilenie", default: ""
+    t.string "Komplektnost", default: ""
+    t.string "Tipkarkasa", default: ""
   end
 
 end

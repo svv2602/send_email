@@ -140,8 +140,17 @@ module InputDataMethods
           KodUKTVED: "КодУКТВЭД",
           VyletDiskaET: "ВылетдискаET",
           VidUslugi: "Видуслуги",
-          PCDDiska: "PCDдиска" ,
-          DIADiska: "DIAдиска"
+          PCDDiska: "PCDдиска",
+          DIADiska: "DIAдиска",
+          Tipdiska: "Типдиска",
+          Shirinadiska: "Ширинадиска",
+          Ship: "Шип",
+          Os: "Ось",
+          KodyTRAOTR: "КодыTRAOTR",
+          Indekssloy̆nosti: "Индексслойности",
+          Usilenie: "Усиление",
+          Komplektnost: "Комплектность",
+          Tipkarkasa: "Типкаркаса"
         },
 
         Leftover: {
