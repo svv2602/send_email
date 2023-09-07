@@ -21,6 +21,7 @@
       <img src="https://tot.biz.ua/upload/email/viber.png" alt="viber" width="30">
     </td>
   </tr>
+  <% if osnovnoi_meneger.present? %>
   <tr style="background-color: #fafafa;text-align: center;">
     <td>
       <h3 style="font-size: 14px;margin: 0;">Ваш персональний менеджер:</h3>
@@ -29,6 +30,8 @@
       <p style="text-decoration: underline; color: #333333;font-size: 14px;margin: 0;"><%= osnovnoi_meneger %></p>
     </td>
   </tr>
+  <% end %>
+
   <tr style="background-color: #fafafa;">
     <td colspan="2" style="text-align: center">
       <h2>Служба партнерської підтримки:</h2>

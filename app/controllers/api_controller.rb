@@ -18,6 +18,7 @@ class ApiController < ApplicationController
   end
 
   def run_import_data_from_api
+    @data_import_based_on_dates = true
     run_methods(:import_data_load, :get_json_files_from_api)
   end
 
@@ -82,6 +83,7 @@ class ApiController < ApplicationController
 
   def import_data
     # Получить данные в базу данных
+    @data_import_based_on_dates = false
     run_methods(:import_data_load)
     render plain: @msg_data_load + "\nОтчет создан: #{Time.now}"
 
