@@ -13,6 +13,9 @@ RUN bundle install
 
 COPY . ./
 
+# Установка часового пояса внутри контейнера
+RUN ln -sf /usr/share/zoneinfo/Europe/Kiev /etc/localtime
+
 EXPOSE 3000
 
 CMD ["rails", "server", "-b", "0.0.0.0"]
