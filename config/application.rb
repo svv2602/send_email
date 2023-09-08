@@ -21,6 +21,8 @@ module SendEmail
     # config.eager_load_paths << Rails.root.join("extras")
     config.autoload_paths += Dir["#{config.root}/lib/**/"]
 
+    config.time_zone = 'Kyiv'
+
     #===================15.08.2023================================
     config.after_initialize do
       def create_directory_if_not_exists(directory_path)
