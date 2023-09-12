@@ -36,6 +36,7 @@ module CreateFileXlsDataTest
                "kopanichuck.da@tot.biz.ua", "shabatura.dn@tot.biz.ua",
                "ivaschenko.sa@tot.biz.ua", "kucherenko.da.tot@gmail.com"]
 
+
       # email = ["snisar.vv@tot.biz.ua"]
 
       count_simple = email.size # количество примеров по email
@@ -47,6 +48,7 @@ module CreateFileXlsDataTest
           Partner: "Партнер #{i}",
           OsnovnoiMeneger: "Менеджер #{rand(count_simple)}",
           TelefonPodrazdeleniia: "123-456-789",
+          TelefonMenedzher: "067 00 000 000",
           Gorod: city[rand(city.size)],
           TipKontragentaILSh: type[rand(type.size)],
           TipKontragentaCMK: type[rand(type.size)],

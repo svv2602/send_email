@@ -68,6 +68,10 @@ module CreateFileXlsMethods
       results.each do |row|
         osnovnoi_meneger = row["OsnovnoiMeneger"]
         recipient_email = row["Email"]
+        telefon_podrazdeleniia = row["TelefonPodrazdeleniia"]
+        telefon_menedzher = row["TelefonMenedzher"]
+
+
 
         # При изменении params создать новый прайс
         unless params == row["params"]
@@ -109,7 +113,11 @@ module CreateFileXlsMethods
         # отправить прайс
         file_path_to_send = hash_dop_email.include?(recipient_email) ? @price_ind_path : @price_path
 
-        MyMailer.send_email_with_attachment(recipient_email.to_s, file_path_to_send, osnovnoi_meneger).deliver_now
+        MyMailer.send_email_with_attachment(recipient_email.to_s,
+                                            file_path_to_send,
+                                            osnovnoi_meneger,
+                                            telefon_podrazdeleniia,
+                                            telefon_menedzher).deliver_now
 
         i += 1 # количество отправок
       end

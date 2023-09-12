@@ -30,6 +30,31 @@
       <p style="text-decoration: underline; color: #333333;font-size: 14px;margin: 0;"><%= osnovnoi_meneger %></p>
     </td>
   </tr>
+
+<!--    контактные данные по менеджеру-->
+    <% if telefon_menedzher.present? %>
+      <tr style="background-color: #fafafa;text-align: center;">
+        <td>
+          <h3 style="font-size: 14px;margin: 0;"></h3>
+        </td>
+        <td>
+          <p style=" color: #333333;font-size: 12px;margin: 0;">моб: <%= telefon_menedzher %></p>
+        </td>
+      </tr>
+    <% end %>
+    <% if telefon_podrazdeleniia.present? %>
+      <tr style="background-color: #fafafa;text-align: center;">
+        <td>
+          <p style="color: #333333;font-size: 12px;margin: 0;">телефон філії:</p>
+        </td>
+        <td>
+          <p style="color: #333333;font-size: 12px;margin: 0;"><%= telefon_podrazdeleniia %></p>
+        </td>
+      </tr>
+    <% end %>
+
+
+
   <% end %>
 
   <tr style="background-color: #fafafa;">

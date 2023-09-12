@@ -18,9 +18,9 @@
 "data": [
 {
 "number": 1,
-"text": "СГ шини",
-"colorfont": "white",
-"colorbackground": "black",
+"text": "С/Г шини",
+"colorfont": "navy",
+"colorbackground": "lime",
 "bold": true,
 "italic": false,
 "size": 18

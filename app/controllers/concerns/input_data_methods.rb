@@ -189,7 +189,8 @@ module InputDataMethods
           TipKontragentaILSh: "ТипКонтрагентаИЛШ",
           TipKontragentaCMK: "ТипКонтрагентаЦМК",
           TipKontragentaSHOP: "ТипКонтрагентаШОП",
-          Podrazdelenie: "Подразделение"
+          Podrazdelenie: "Подразделение",
+          TelefonMenedzher: "ТелефонМенеджера"
         }
       }
 
