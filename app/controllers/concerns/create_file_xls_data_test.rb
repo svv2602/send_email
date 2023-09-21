@@ -37,7 +37,7 @@ module CreateFileXlsDataTest
                "ivaschenko.sa@tot.biz.ua", "kucherenko.da.tot@gmail.com"]
 
 
-      email = ["snisar.vv@tot.biz.ua"]
+      # email = ["snisar.vv@tot.biz.ua"]
 
       count_simple = email.size # количество примеров по email
 
