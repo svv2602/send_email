@@ -97,6 +97,7 @@ module CreateFileXlsMethods
           # удалить старый прайс
           File.delete(@price_ind_path) if File.exist?(@price_ind_path)
           recipient_email_price = hash_dop_email[recipient_email]
+          puts "DEBUG recipient_email_price = #{recipient_email_price.inspect}"
           # создать новый индивидуальный прайс
           @hash_value = hash_value_keys_partner(row["TipKontragentaILSh"],
                                                 row["TipKontragentaCMK"],
@@ -355,6 +356,7 @@ module CreateFileXlsMethods
           end
         end
       end
+
       result
       # пример вывода:
       # {"iiiiiii@gmail.com"=>{"Легковые шины"=>"Мин", "Диски"=>"Опт"},
@@ -461,7 +463,9 @@ module CreateFileXlsMethods
 
           end
           # Добавить к списку цен индивидуальную колонку
+          puts "DEBUG sheet_name= #{sheet_name }"
           price << hash_value[:hash_email_price][sheet_name] if hash_value[:hash_email_price][sheet_name].present?
+          puts "DEBUG hash_value[:hash_email_price][sheet_name] #{hash_value.inspect}"
           price = price.flatten.uniq
 
 

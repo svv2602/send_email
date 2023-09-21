@@ -1,9 +1,18 @@
 [
 {
-"price": "Мин",
+"price": "Опт",
 "list": "Легковые шины",
 "emails": [
-"pogoreltsev.iv@tot.biz.ua"
+"pogoreltsev.iv@tot.biz.ua",
+"svv@invelta.com.ua"
+]
+},
+{
+"price": "Спец А",
+"list": "Легковые шины",
+"emails": [
+"pogoreltsev.iv@tot.biz.ua",
+"svv@invelta.com.ua"
 ]
 }
 ]
