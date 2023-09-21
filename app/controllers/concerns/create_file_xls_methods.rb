@@ -463,7 +463,7 @@ module CreateFileXlsMethods
           # Добавить к списку цен индивидуальную колонку
           price << hash_value[:hash_email_price][sheet_name] if hash_value[:hash_email_price][sheet_name].present?
           price = price.flatten.uniq
-          puts "DEBUG price = #{price.inspect}"
+
 
           # ====================================================
           # Определение дополнительного склада для подразделения
