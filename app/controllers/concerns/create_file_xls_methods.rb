@@ -449,10 +449,13 @@ module CreateFileXlsMethods
               result2 = ""
             end
 
+
             value["settings"]["ТипыЦен"]["settings"].each do |el|
               el.each do |key, value|
                 price << el["default"] if key == "default"
-                price << el["prices"] if el["type"] == result2
+                if el && result2 && el["type"] == hash_value[result2[0]]
+                  price << el["prices"]
+                end
               end
             end
 
@@ -460,6 +463,7 @@ module CreateFileXlsMethods
           # Добавить к списку цен индивидуальную колонку
           price << hash_value[:hash_email_price][sheet_name] if hash_value[:hash_email_price][sheet_name].present?
           price = price.flatten.uniq
+          puts "DEBUG price = #{price.inspect}"
 
           # ====================================================
           # Определение дополнительного склада для подразделения
